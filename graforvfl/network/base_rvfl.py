@@ -36,7 +36,7 @@ class BaseRVFL(BaseEstimator):
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"]
         For definition of these methods, please check it at: https://keras.io/api/layers/initializers/
 
-    trainer : str, default = "OLS"
+    trainer : str, default = "MPI"
         The utilized method for training weights of hidden-output layer and weights of input-output layer.
             + MPI: Moore-Penrose inversion
             + OLS: Ordinary Least Squares (OLS) without regularization
@@ -54,7 +54,7 @@ class BaseRVFL(BaseEstimator):
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"
     ]
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="OLS", alpha=0.5):
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="MPI", alpha=0.5):
         self.size_hidden = size_hidden
         self.act_name = act_name
         self.act_func = getattr(activator, self.act_name)
@@ -103,7 +103,7 @@ class BaseRVFL(BaseEstimator):
         else:
             raise TypeError("Invalid y array type, it should be list, tuple or np.ndarray")
         self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input))
-        self.weights["bh"] = self.weight_randomer(self.size_hidden)
+        self.weights["bh"] = self.weight_randomer(self.size_hidden).flatten()
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         self.weights["Wioho"] = self._trained(self.trainer, D, y)
