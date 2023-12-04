@@ -31,7 +31,7 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"]
         For definition of these methods, please check it at: https://keras.io/api/layers/initializers/
 
-    trainer : str, default = "OLS"
+    trainer : str, default = "MPI"
         The utilized method for training weights of hidden-output layer and weights of input-output layer.
             + MPI: Moore-Penrose inversion
             + OLS: Ordinary Least Squares (OLS) without regularization
@@ -53,7 +53,7 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
     >>> print(pred)
     """
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5):
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5):
         super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha)
 
     def score(self, X, y, method="RMSE"):
@@ -87,7 +87,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"]
         For definition of these methods, please check it at: https://keras.io/api/layers/initializers/
 
-    trainer : str, default = "OLS"
+    trainer : str, default = "MPI"
         The utilized method for training weights of hidden-output layer and weights of input-output layer.
             + MPI: Moore-Penrose inversion
             + OLS: Ordinary Least Squares (OLS) without regularization
@@ -112,7 +112,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
 
     CLS_OBJ_LOSSES = ["CEL", "HL", "KLDL", "BSL"]
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5):
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5):
         super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha)
         self.n_labels = None
         self.obj_scaler = None
@@ -134,7 +134,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         y_scaled = self.obj_scaler.transform(y)
 
         self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input))
-        self.weights["bh"] = self.weight_randomer(self.size_hidden)
+        self.weights["bh"] = self.weight_randomer(self.size_hidden).flatten()
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         self.weights["Wioho"] = self._trained(self.trainer, D, y_scaled)
