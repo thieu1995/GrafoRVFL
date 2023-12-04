@@ -5,13 +5,14 @@
 # --------------------------------------------------%
 
 import numpy as np
+from numbers import Number
 
 
 def get_correct_shape(shape):
-    if type(shape) is int:
+    if isinstance(shape, Number):
         return (shape, 1)
     elif type(shape) in (list, tuple, np.ndarray) and len(shape) == 1:
-        return (shape, 1)
+        return (shape[0], 1)
     else:
         return shape
 
