@@ -3,7 +3,7 @@
 
 ---
 
-[![GitHub release](https://img.shields.io/badge/release-1.1.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
+[![GitHub release](https://img.shields.io/badge/release-1.0.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
 [![Wheel](https://img.shields.io/pypi/wheel/gensim.svg)](https://pypi.python.org/pypi/graforvfl) 
 [![PyPI version](https://badge.fury.io/py/graforvfl.svg)](https://badge.fury.io/py/graforvfl)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/graforvfl.svg)
@@ -39,12 +39,12 @@ or optimize weights in the network using gradient-free optimizers.
 
 # Citation Request 
 
-Learn more about Random Vector Functional Link from [this paper](https://doi.org/10.1016/j.ins.2015.09.025)
+* Learn more about Random Vector Functional Link from [this paper](https://doi.org/10.1016/j.ins.2015.09.025)
 
-Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from 
+* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from 
 [this paper](https://doi.org/10.1109/TCSS.2022.3146974)
 
-Learn more about on how to use Gradient Free Optimization to optimize the weights of RVFL netweorks from [this paper](https://doi.org/10.1109/SOCA.2018.00014)
+* Learn more about on how to use Gradient Free Optimization to optimize the weights of RVFL netweorks from [this paper](https://doi.org/10.1109/SOCA.2018.00014)
 
 
 
@@ -179,7 +179,7 @@ data.y_train, scaler_y = data.encode_label(data.y_train)  # This is for classifi
 data.y_test = scaler_y.transform(data.y_test)
 ```
 
-##### Network class
+##### `Neural Network` class
 
 ```python
 from graforvfl import RvflRegressor, RvflClassifier, MhaTuneRvfl
@@ -206,7 +206,7 @@ model = MhaTuneRvfl(problem_type="regression", bounds=my_bounds, cv=3, scoring="
                       optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
 ```
 
-##### Supported functions in model object
+##### Supported functions in `model` object
 
 ```python
 from graforvfl import RvflRegressor, Data 
