@@ -1,6 +1,6 @@
 
 
-# Version 1.0.0
+# Version 1.0.0 (First version)
 
 + This library uses Numpy only - Gradient Free (No Pytorch, No Tensorflow)
 + Add infors (CODE_OF_CONDUCT.md, MANIFEST.in, LICENSE, requirements.txt)
@@ -9,3 +9,9 @@
 + Add `MhaTuneRvfl` class that can be used to tune RVFL network
 + Add publish workflow
 + Add examples and tests folders
+
+------------------------------------------------------------------------------
+
+# Version 0.0.1
+
++ Test version to get Zonodo DOI
