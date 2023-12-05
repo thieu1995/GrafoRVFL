@@ -15,7 +15,7 @@ def readme():
 
 setup(
     name="graforvfl",
-    version="0.0.1",
+    version="1.0.0",
     author="Thieu",
     author_email="nguyenthieu2102@gmail.com",
     description="GrafoRVFL: A Python Library for Maximizing Performance of Random Vector Functional Link Network with Gradient-Free Optimization",

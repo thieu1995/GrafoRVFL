@@ -4,7 +4,7 @@
 #       Github: https://github.com/thieu1995        %                         
 # --------------------------------------------------%
 
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 
 from graforvfl.shared.data_processor import DataTransformer, Data, get_dataset
 from graforvfl.network.standard_rvfl import RvflRegressor, RvflClassifier
