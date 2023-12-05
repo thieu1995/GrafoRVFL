@@ -16,7 +16,7 @@
 [![Chat](https://img.shields.io/badge/Chat-on%20Telegram-blue)](https://t.me/+fRVCJGuGJg1mNDg1)
 ![GitHub contributors](https://img.shields.io/github/contributors/thieu1995/graforvfl.svg)
 [![GitTutorial](https://img.shields.io/badge/PR-Welcome-%23FF8300.svg?)](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project)
-[![DOI](https://zenodo.org/badge/676088001.svg)](https://zenodo.org/doi/10.5281/zenodo.10251021)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10258280.svg)](https://doi.org/10.5281/zenodo.10258280)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
@@ -52,13 +52,13 @@ Please include these citations if you plan to use this library:
 
 ```code
 
-@software{nguyen_van_thieu_2023_10251022,
+@software{nguyen_van_thieu_2023_10258280,
   author       = {Nguyen Van Thieu},
   title        = {GrafoRVFL: A Python Library for Maximizing Performance of Random Vector Functional Link Network with Gradient-Free Optimization},
   month        = dec,
   year         = 2023,
   publisher    = {Zenodo},
-  doi          = {},
+  doi          = {10.5281/zenodo.10258280},
   url          = {https://github.com/thieu1995/GrafoRVFL}
 }
 
