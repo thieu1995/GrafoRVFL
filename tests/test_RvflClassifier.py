@@ -7,14 +7,14 @@
 import numpy as np
 from graforvfl import RvflClassifier
 
-np.random.seed(41)
+np.random.seed(42)
 
 
 def test_RvflClassifier_class():
     X = np.random.rand(100, 6)
     y = np.random.randint(0, 2, size=100)
 
-    model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI")
+    model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", seed=42)
     model.fit(X, y)
     pred = model.predict(X)
     assert RvflClassifier.SUPPORTED_CLS_METRICS == model.SUPPORTED_CLS_METRICS
