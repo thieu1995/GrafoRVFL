@@ -124,6 +124,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
             if y.ndim == 1:
                 self.n_labels = len(np.unique(y))
                 self.size_output = self.n_labels
+                self.classes_ = np.unique(y)
             else:
                 raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
         else:
@@ -148,7 +149,8 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
 
     def predict(self, X):
         y_pred = self.predict_proba(X)
-        return self.obj_scaler.inverse_transform(y_pred)
+        temp = self.obj_scaler.inverse_transform(y_pred)
+        return temp
 
     def score(self, X, y, method="AS"):
         return self._BaseRVFL__score_cls(X, y, method)
