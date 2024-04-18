@@ -3,7 +3,7 @@
 
 ---
 
-[![GitHub release](https://img.shields.io/badge/release-1.0.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
+[![GitHub release](https://img.shields.io/badge/release-1.1.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
 [![Wheel](https://img.shields.io/pypi/wheel/gensim.svg)](https://pypi.python.org/pypi/graforvfl) 
 [![PyPI version](https://badge.fury.io/py/graforvfl.svg)](https://badge.fury.io/py/graforvfl)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/graforvfl.svg)
@@ -20,7 +20,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
-GrafoRVFL is an open-source library in Python that employs gradient-free optimization ((GA, PSO, WOA, TLO, DE, ...) to 
+GrafoRVFL is an open-source library in Python that employs gradient-free optimization (GA, PSO, WOA, TLO, DE, ...) to 
 optimize Random Vector Functional Link Networks. It is entirely implemented based on Numpy and fully compatible 
 with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tune the hyper-parameters of network 
 or optimize weights in the network using gradient-free optimizers.
@@ -54,7 +54,7 @@ Please include these citations if you plan to use this library:
 
 @software{nguyen_van_thieu_2023_10258280,
   author       = {Nguyen Van Thieu},
-  title        = {GrafoRVFL: A Python Library for Maximizing Performance of Random Vector Functional Link Network with Gradient-Free Optimization},
+  title        = {GrafoRVFL: A Gradient-Free Optimization Framework for Boosting Random Vector Functional Link Network},
   month        = dec,
   year         = 2023,
   publisher    = {Zenodo},
@@ -97,7 +97,7 @@ Please include these citations if you plan to use this library:
 
 * Install the [current PyPI release](https://pypi.python.org/pypi/graforvfl):
 ```sh 
-$ pip install graforvfl==1.0.0
+$ pip install graforvfl==1.1.0
 ```
 
 * Install directly from source code

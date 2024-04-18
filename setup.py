@@ -15,10 +15,10 @@ def readme():
 
 setup(
     name="graforvfl",
-    version="1.0.0",
+    version="1.1.0",
     author="Thieu",
     author_email="nguyenthieu2102@gmail.com",
-    description="GrafoRVFL: A Python Library for Maximizing Performance of Random Vector Functional Link Network with Gradient-Free Optimization",
+    description="GrafoRVFL: A Gradient-Free Optimization Framework for Boosting Random Vector Functional Link Network",
     long_description=readme(),
     long_description_content_type="text/markdown",
     keywords=["random vector functional link", "machine learning", "artificial intelligence",
