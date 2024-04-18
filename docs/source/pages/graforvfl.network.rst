@@ -1,9 +1,6 @@
 graforvfl.network package
 =========================
 
-Submodules
-----------
-
 graforvfl.network.base\_rvfl module
 -----------------------------------
 
@@ -12,10 +9,10 @@ graforvfl.network.base\_rvfl module
    :undoc-members:
    :show-inheritance:
 
-graforvfl.network.mha\_tune\_rvfl module
-----------------------------------------
+graforvfl.network.gfo\_rvfl\_tuner module
+-----------------------------------------
 
-.. automodule:: graforvfl.network.mha_tune_rvfl
+.. automodule:: graforvfl.network.gfo_rvfl_tuner
    :members:
    :undoc-members:
    :show-inheritance:

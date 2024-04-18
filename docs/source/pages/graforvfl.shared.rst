@@ -1,9 +1,6 @@
 graforvfl.shared package
 ========================
 
-Submodules
-----------
-
 graforvfl.shared.activator module
 ---------------------------------
 

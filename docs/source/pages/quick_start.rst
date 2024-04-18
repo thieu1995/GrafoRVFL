@@ -2,47 +2,60 @@
 Installation
 ============
 
-* Install the `current PyPI release <https://pypi.python.org/pypi/graforvfl />`_::
+* Install the `current PyPI release <https://pypi.python.org/pypi/graforvfl />`_
 
-   $ pip install graforvfl==1.1.0
+.. code-block:: bash
+
+	$ pip install graforvfl==1.1.0
 
 
-* Install directly from source code::
+* Install directly from source code.
+
+.. code-block:: bash
 
    $ git clone https://github.com/thieu1995/GrafoRVFL.git
    $ cd GrafoRVFL
    $ python setup.py install
 
-* In case, you want to install the development version from Github::
+* In case, you want to install the development version from Github
+
+.. code-block:: bash
 
    $ pip install git+https://github.com/thieu1995/GrafoRVFL
 
 
-After installation, you can import GrafoRVFL as any other Python module::
+After installation, you can check the version of installed GrafoRVFL::
 
    $ python
    >>> import graforvfl
    >>> graforvfl.__version__
 
-========
-Examples
-========
+=========
+Tutorials
+=========
 
 In this section, we will explore the usage of the GrafoRVFL model with the assistance of a dataset. While all the
 preprocessing steps mentioned below can be replicated using Scikit-Learn, we have implemented some utility functions
 to provide users with convenience and faster usage.
 
 
-Current provided classes::
+Provided classes
+----------------
+
+Classes that hold Models and Dataset
+
+.. code-block:: python
 
 	from graforvfl import DataTransformer, Data
-	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflTuner
+	from graforvfl import RvflRegressor, RvflClassifier
+	from graforvfl import GfoRvflTuner
 
 
-##### `DataTransformer` class
+`DataTransformer` class
+-----------------------
 
 We provide many scaler classes that you can select and make a combination of transforming your data via
-DataTransformer class. For example: scale data by `Loge` and then `Sqrt` and then `MinMax`::
+`DataTransformer` class. For example: scale data by `Loge` and then `Sqrt` and then `MinMax`::
 
 	from graforvfl import DataTransformer
 	import pandas as pd
@@ -58,12 +71,15 @@ DataTransformer class. For example: scale data by `Loge` and then `Sqrt` and the
 	X_test_scaled = dt.transform(X_test)
 
 
-##### `Data` class
+`Data` class
+------------
 
 + You can load your dataset into Data class
 + You can split dataset to train and test set
 + You can scale dataset without using DataTransformer class
-+ You can scale labels using LabelEncoder::
++ You can scale labels using LabelEncoder
+
+.. code-block:: python
 
 	from graforvfl import Data
 	import pandas as pd
@@ -87,7 +103,10 @@ DataTransformer class. For example: scale data by `Loge` and then `Sqrt` and the
 
 
 
-##### `Neural Network` class::
+`Neural Network` class
+----------------------
+
+.. code-block:: python
 
 	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflTuner
 	from mealpy import IntegerVar, StringVar
@@ -113,7 +132,10 @@ DataTransformer class. For example: scale data by `Loge` and then `Sqrt` and the
 	                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
 
 
-##### Supported functions in `model` object::
+Supported functions in `model` object
+-------------------------------------
+
+.. code-block:: python
 
 	from graforvfl import RvflRegressor, Data
 
