@@ -42,7 +42,7 @@ class HyperparameterProblem(Problem):
             # Make predictions on the test set
             y_pred = self.model.predict(X_test)
             # Calculate accuracy for the current fold
-            mt = self.metric_class(y_test, y_pred, decimal=8)
+            mt = self.metric_class(y_test, y_pred)
             score = mt.get_metric_by_name(self.obj_name)[self.obj_name]
             # Accumulate accuracy across folds
             scores.append(score)
