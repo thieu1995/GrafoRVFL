@@ -17,7 +17,7 @@ from graforvfl import RvflRegressor, RvflClassifier
 
 
 class HyperparameterProblem(Problem):
-    def __init__(self, bounds=None, minmax="max", X=None, y=None, model_class=None, metric_class=None, obj_name=None, cv=5, **kwargs):
+    def __init__(self, bounds=None, minmax="max", X=None, y=None, model_class=None, metric_class=None, obj_name=None, cv=5, seed=None, **kwargs):
         self.model_class = model_class
         self.model = None
         self.X = X
@@ -25,7 +25,8 @@ class HyperparameterProblem(Problem):
         self.metric_class = metric_class
         self.obj_name = obj_name
         self.cv = cv
-        self.kf = KFold(n_splits=cv, shuffle=True, random_state=42)
+        self.seed = seed
+        self.kf = KFold(n_splits=cv, shuffle=True, random_state=self.seed)
         super().__init__(bounds, minmax, **kwargs)
 
     def obj_func(self, x):
@@ -55,7 +56,7 @@ class GfoRvflTuner:
     SUPPORTED_REG_METRICS = get_all_regression_metrics()
 
     def __init__(self, problem_type="regression", bounds=None, cv=5, scoring="MSE",
-                 optimizer="OriginalWOA", optimizer_paras=None, verbose=True):
+                 optimizer="OriginalWOA", optimizer_paras=None, verbose=True, seed=None):
         if problem_type == "regression":
             self.network_class = RvflRegressor
             self.scoring = boundary_controller.check_str("scoring", scoring, self.SUPPORTED_REG_METRICS)
@@ -66,6 +67,7 @@ class GfoRvflTuner:
             self.scoring = boundary_controller.check_str("scoring", scoring, self.SUPPORTED_CLS_METRICS)
             self.minmax = self.SUPPORTED_CLS_METRICS[self.scoring]
             self.metric_class = ClassificationMetric
+        self.seed = seed
         self.problem_type = problem_type
         self.bounds = bounds
         self.cv = cv
@@ -92,8 +94,8 @@ class GfoRvflTuner:
 
     def fit(self, X, y):
         self.problem = HyperparameterProblem(self.bounds, self.minmax, X, y, self.network_class, self.metric_class,
-                                             obj_name=self.scoring, cv=self.cv, log_to=self.verbose)
-        self.optimizer.solve(self.problem)
+                                             obj_name=self.scoring, cv=self.cv, log_to=self.verbose, seed=self.seed)
+        self.optimizer.solve(self.problem, seed=self.seed)
         self.best_params = self.optimizer.problem.decode_solution(self.optimizer.g_best.solution)
         self.best_estimator = self.network_class(**self.best_params)
         self.best_estimator.fit(X, y)
