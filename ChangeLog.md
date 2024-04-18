@@ -1,4 +1,13 @@
 
+# Version 1.1.0 
+
++ Rename MhaTuneRvfl class to GfoRvflTuner class
++ Add seed parameter to all classes.
++ Add examples with GridSearchCV
++ Update PerMetrics and Mealpy dependencies
++ Update documents
+
+------------------------------------------------------------------------------
 
 # Version 1.0.0 (First version)
 
