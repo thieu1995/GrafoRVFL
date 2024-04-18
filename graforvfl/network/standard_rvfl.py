@@ -40,6 +40,10 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
     alpha : float (Optional), default=0.5
         The penalty value for L2 method. Only effect when `trainer`="L2".
 
+    seed: int, default=None
+        Determines random number generation for weights and bias initialization.
+        Pass an int for reproducible results across multiple function calls.
+
     Examples
     --------
     >>> from graforvfl import RvflRegressor, Data
@@ -47,14 +51,14 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
     >>> X, y = make_regression(n_samples=200, random_state=1)
     >>> data = Data(X, y)
     >>> data.split_train_test(test_size=0.2, random_state=1)
-    >>> model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5)
+    >>> model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5, seed=42)
     >>> model.fit(data.X_train, data.y_train)
     >>> pred = model.predict(data.X_test)
     >>> print(pred)
     """
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5):
-        super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha)
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5, seed=None):
+        super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha, seed=seed)
 
     def score(self, X, y, method="RMSE"):
         return self._BaseRVFL__score_reg(X, y, method)
@@ -96,6 +100,10 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
     alpha : float (Optional), default=0.5
         The penalty value for L2 method. Only effect when `trainer`="L2".
 
+    seed: int, default=None
+        Determines random number generation for weights and bias initialization.
+        Pass an int for reproducible results across multiple function calls.
+
     Examples
     --------
     >>> from graforvfl import Data, RvflClassifier
@@ -103,7 +111,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
     >>> X, y = make_classification(n_samples=100, random_state=1)
     >>> data = Data(X, y)
     >>> data.split_train_test(test_size=0.2, random_state=1)
-    >>> model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5)
+    >>> model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5, seed=42)
     >>> model.fit(data.X_train, data.y_train)
     >>> pred = model.predict(data.X_test)
     >>> print(pred)
@@ -112,8 +120,8 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
 
     CLS_OBJ_LOSSES = ["CEL", "HL", "KLDL", "BSL"]
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5):
-        super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha)
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5, seed=None):
+        super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha, seed=seed)
         self.n_labels = None
         self.obj_scaler = None
 
@@ -149,8 +157,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
 
     def predict(self, X):
         y_pred = self.predict_proba(X)
-        temp = self.obj_scaler.inverse_transform(y_pred)
-        return temp
+        return self.obj_scaler.inverse_transform(y_pred)
 
     def score(self, X, y, method="AS"):
         return self._BaseRVFL__score_cls(X, y, method)

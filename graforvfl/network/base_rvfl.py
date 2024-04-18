@@ -44,6 +44,10 @@ class BaseRVFL(BaseEstimator):
 
     alpha : float (Optional), default=0.5
         The penalty value for L2 method. Only effect when `trainer`="L2".
+
+    seed: int, default=None
+        Determines random number generation for weights and bias initialization.
+        Pass an int for reproducible results across multiple function calls.
     """
 
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
@@ -54,10 +58,11 @@ class BaseRVFL(BaseEstimator):
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"
     ]
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="MPI", alpha=0.5):
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="MPI", alpha=0.5, seed=None):
         self.size_hidden = size_hidden
         self.act_name = act_name
         self.act_func = getattr(activator, self.act_name)
+        self.seed = seed
         self.weight_initializer, self.weight_randomer = self._get_weight_initializer(weight_initializer)
         self.trainer = trainer
         self.alpha = alpha
@@ -84,10 +89,10 @@ class BaseRVFL(BaseEstimator):
         if trainer == "MPI":
             return np.linalg.pinv(D) @ y
         elif trainer == "L2":
-            ridge_model = Ridge(alpha=self.alpha, fit_intercept=False)
+            ridge_model = Ridge(alpha=self.alpha, fit_intercept=False, random_state=self.seed)
             return ridge_model.fit(D, y).coef_.T
         else:
-            ridge_model = Ridge(alpha=0.0, fit_intercept=False)
+            ridge_model = Ridge(alpha=0.0, fit_intercept=False, random_state=self.seed)
             return ridge_model.fit(D, y).coef_.T
 
     def fit(self, X, y):
@@ -102,8 +107,8 @@ class BaseRVFL(BaseEstimator):
                 raise TypeError("Invalid y array shape, it should be 1D vector or 2D matrix.")
         else:
             raise TypeError("Invalid y array type, it should be list, tuple or np.ndarray")
-        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input))
-        self.weights["bh"] = self.weight_randomer(self.size_hidden).flatten()
+        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input), seed=self.seed)
+        self.weights["bh"] = self.weight_randomer(self.size_hidden, seed=self.seed).flatten()
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         self.weights["Wioho"] = self._trained(self.trainer, D, y)
