@@ -14,7 +14,7 @@ Please include these citations if you plan to use this library::
 
 	@software{nguyen_van_thieu_2023_10258280,
 	  author       = {Nguyen Van Thieu},
-	  title        = {GrafoRVFL: A Python Library for Maximizing Performance of Random Vector Functional Link Network with Gradient-Free Optimization},
+	  title        = {GrafoRVFL: A Gradient-Free Optimization Framework for Boosting Random Vector Functional Link Network},
 	  month        = dec,
 	  year         = 2023,
 	  publisher    = {Zenodo},
