@@ -17,61 +17,74 @@ def get_correct_shape(shape):
         return shape
 
 
-def orthogonal_initializer(shape, gain=1.0):
+def get_generator(seed=None):
+    return np.random.default_rng(seed)
+
+
+def orthogonal_initializer(shape, gain=1.0, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     flat_shape = (shape[0], np.prod(shape[1:]))
-    a = np.random.normal(0.0, 1.0, flat_shape)
+    a = generator.normal(0., 1., flat_shape)
     u, _, v = np.linalg.svd(a, full_matrices=False)
     q = u if u.shape == flat_shape else v
     q = q.reshape(shape)
     return gain * q[:shape[0], :shape[1]]
 
 
-def he_uniform_initializer(shape):
+def he_uniform_initializer(shape, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     fan_in = shape[0] if len(shape) == 2 else np.prod(shape[1:])
     limit = np.sqrt(6 / fan_in)
-    return np.random.uniform(-limit, limit, shape)
+    return generator.uniform(-limit, limit, shape)
 
 
-def he_normal_initializer(shape):
+def he_normal_initializer(shape, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     fan_in = shape[0] if len(shape) == 2 else np.prod(shape[1:])
     stddev = np.sqrt(2 / fan_in)
-    return np.random.normal(0.0, stddev, shape)
+    return generator.normal(0.0, stddev, shape)
 
 
-def glorot_uniform_initializer(shape):
+def glorot_uniform_initializer(shape, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     fan_in, fan_out = shape
     limit = np.sqrt(6 / (fan_in + fan_out))
-    return np.random.uniform(-limit, limit, shape)
+    return generator.uniform(-limit, limit, shape)
 
 
-def glorot_normal_initializer(shape):
+def glorot_normal_initializer(shape, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     fan_in, fan_out = shape
     stddev = np.sqrt(2 / (fan_in + fan_out))
-    return np.random.normal(0.0, stddev, shape)
+    return generator.normal(0.0, stddev, shape)
 
 
-def lecun_uniform_initializer(shape):
+def lecun_uniform_initializer(shape, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     fan_in = shape[0] if len(shape) == 2 else np.prod(shape[1:])
     limit = np.sqrt(3 / fan_in)
-    return np.random.uniform(-limit, limit, shape)
+    return generator.uniform(-limit, limit, shape)
 
 
-def lecun_normal_initializer(shape):
+def lecun_normal_initializer(shape, seed=None):
+    generator = get_generator(seed)
     shape = get_correct_shape(shape)
     fan_in = shape[0] if len(shape) == 2 else np.prod(shape[1:])
     stddev = np.sqrt(1 / fan_in)
-    return np.random.normal(0.0, stddev, shape)
+    return generator.normal(0.0, stddev, shape)
 
 
-def random_uniform_initializer(shape, minval=0.0, maxval=1.0):
-    return np.random.uniform(minval, maxval, shape)
+def random_uniform_initializer(shape, minval=0.0, maxval=1.0, seed=None):
+    generator = get_generator(seed)
+    return generator.uniform(minval, maxval, shape)
 
 
-def random_normal_initializer(shape, mean=0.0, stddev=1.0):
-    return np.random.normal(mean, stddev, shape)
+def random_normal_initializer(shape, mean=0.0, stddev=1.0, seed=None):
+    generator = get_generator(seed)
+    return generator.normal(mean, stddev, shape)
