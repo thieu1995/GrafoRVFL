@@ -2,12 +2,11 @@
 Citation Request
 ================
 
-* Learn more about Random Vector Functional Link from `this link <https://doi.org/10.1016/j.ins.2015.09.025>`_
+* Learn more about Random Vector Functional Link from `paper 01 <https://doi.org/10.1016/j.ins.2015.09.025>`_
 
-* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from `this link <https://doi.org/10.1109/TCSS.2022.3146974>`_
+* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from `paper 02 <https://doi.org/10.1109/TCSS.2022.3146974>`_
 
-* Learn more about on how to use Gradient Free Optimization to optimize the weights of RVFL netweorks from
-`this link <https://doi.org/10.1109/SOCA.2018.00014>`_
+* Learn more about on how to use Gradient Free Optimization to optimize the weights of RVFL networks from `paper 03 <https://doi.org/10.1109/SOCA.2018.00014>`_.
 
 
 Please include these citations if you plan to use this library::
@@ -52,7 +51,7 @@ Please include these citations if you plan to use this library::
 
 ```
 
-If you have an open-ended or a research question, you can contact me via nguyenthieu2102@gmail.com
+If you have an open-ended or a research question, you can contact me via nguyenthieu2102@gmail.com.
 
 
 ===============
@@ -75,7 +74,7 @@ Important links
     * https://github.com/thieu1995/pfevaluator
     * https://github.com/thieu1995/intelelm
     * https://github.com/thieu1995/reflame
-	* https://github.com/thieu1995/MetaPerceptron
+    * https://github.com/thieu1995/MetaPerceptron
     * https://github.com/aiir-team
 
 
