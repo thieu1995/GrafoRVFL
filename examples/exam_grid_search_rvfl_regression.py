@@ -26,7 +26,7 @@ param_grid = {
 }
 
 # Step 4: Create the model
-model = RvflRegressor()
+model = RvflRegressor(seed=42)
 
 # Step 5: Perform grid search
 grid_search = GridSearchCV(model, param_grid, scoring='neg_mean_squared_error')

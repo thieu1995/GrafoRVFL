@@ -25,7 +25,7 @@ param_grid = {
 }
 
 # Step 4: Create the model
-model = RvflClassifier()
+model = RvflClassifier(seed=42)
 
 # Step 5: Perform grid search
 grid_search = GridSearchCV(model, param_grid, scoring='accuracy')

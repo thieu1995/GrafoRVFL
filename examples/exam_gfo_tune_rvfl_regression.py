@@ -35,7 +35,7 @@ my_bounds = [
 
 opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
 model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
-                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
+                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True, seed=42)
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
