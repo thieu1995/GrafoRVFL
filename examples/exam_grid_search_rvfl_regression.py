@@ -6,7 +6,7 @@
 
 
 from sklearn.datasets import load_diabetes
-from graforvfl import Data, RvflRegressor
+from graforvfl import RvflRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
 
 # Step 1: Load the Diabetes dataset

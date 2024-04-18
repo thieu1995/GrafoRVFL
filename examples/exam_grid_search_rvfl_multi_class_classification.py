@@ -5,7 +5,7 @@
 # --------------------------------------------------%
 
 from sklearn.datasets import load_iris
-from graforvfl import Data, RvflClassifier
+from graforvfl import RvflClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 
 # Step 1: Load the Iris dataset
