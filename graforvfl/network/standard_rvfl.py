@@ -128,7 +128,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
                 raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
         else:
             raise TypeError("Invalid y array type, it should be list, tuple or np.ndarray")
-        ohe_scaler = OneHotEncoder(sparse=False)
+        ohe_scaler = OneHotEncoder(sparse_output=False)
         ohe_scaler.fit(np.reshape(y, (-1, 1)))
         self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
         y_scaled = self.obj_scaler.transform(y)
