@@ -36,7 +36,7 @@ to provide users with convenience and faster usage.
 Current provided classes::
 
 	from graforvfl import DataTransformer, Data
-	from graforvfl import RvflRegressor, RvflClassifier, MhaTuneRvfl
+	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflTuner
 
 
 ##### `DataTransformer` class
@@ -89,7 +89,7 @@ DataTransformer class. For example: scale data by `Loge` and then `Sqrt` and the
 
 ##### `Neural Network` class::
 
-	from graforvfl import RvflRegressor, RvflClassifier, MhaTuneRvfl
+	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflTuner
 	from mealpy import IntegerVar, StringVar
 
 	## 1. Use standard RVFL model for regression problem
@@ -109,7 +109,7 @@ DataTransformer class. For example: scale data by `Loge` and then `Sqrt` and the
 	                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
 	]
 	opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-	model = MhaTuneRvfl(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
+	model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
 	                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
 
 

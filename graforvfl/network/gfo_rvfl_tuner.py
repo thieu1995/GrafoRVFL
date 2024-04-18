@@ -49,7 +49,7 @@ class HyperparameterProblem(Problem):
         return np.mean(scores)
 
 
-class MhaTuneRvfl:
+class GfoRvflTuner:
 
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
     SUPPORTED_REG_METRICS = get_all_regression_metrics()

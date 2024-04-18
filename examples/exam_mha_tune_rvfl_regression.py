@@ -6,7 +6,7 @@
 
 from sklearn.datasets import load_diabetes
 from mealpy import StringVar, IntegerVar
-from graforvfl import Data, MhaTuneRvfl
+from graforvfl import Data, GfoRvflTuner
 
 
 ## Load data object
@@ -34,7 +34,7 @@ my_bounds = [
 ]
 
 opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-model = MhaTuneRvfl(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
+model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
                       optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
 model.fit(data.X_train, data.y_train)
 print(model.best_params)

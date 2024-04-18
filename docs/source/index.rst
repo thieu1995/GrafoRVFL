@@ -59,7 +59,7 @@ or optimize weights in the network using gradient-free optimizers.
 
 
 * **Free software:** GNU General Public License (GPL) V3 license
-* **Provided Estimator**: RvflRegressor, RvflClassifier, MhaTuneRvfl
+* **Provided Estimator**: RvflRegressor, RvflClassifier, GfoRvflTuner
 * **Total Gradient Free based RVFL Regressor**: > 200 Models
 * **Total Gradient Free based RVFL Classifier**: > 200 Models
 * **Supported performance metrics**: >= 67 (47 regressions and 20 classifications)

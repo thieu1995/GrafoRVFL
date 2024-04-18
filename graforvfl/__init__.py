@@ -8,4 +8,4 @@ __version__ = "1.1.0"
 
 from graforvfl.shared.data_processor import DataTransformer, Data, get_dataset
 from graforvfl.network.standard_rvfl import RvflRegressor, RvflClassifier
-from graforvfl.network.mha_tune_rvfl import MhaTuneRvfl
+from graforvfl.network.gfo_rvfl_tuner import GfoRvflTuner

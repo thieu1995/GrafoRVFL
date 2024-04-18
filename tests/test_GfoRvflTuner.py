@@ -6,12 +6,12 @@
 
 import numpy as np
 from mealpy import IntegerVar, StringVar
-from graforvfl import MhaTuneRvfl
+from graforvfl import GfoRvflTuner
 
 np.random.seed(42)
 
 
-def test_MhaTuneRvfl_class():
+def test_GfoRvflTuner_class():
     X = np.random.uniform(low=0.0, high=1.0, size=(100, 5))
     noise = np.random.normal(loc=0.0, scale=0.1, size=(100, 5))
     y = 2 * X + 1 + noise
@@ -26,12 +26,12 @@ def test_MhaTuneRvfl_class():
     ]
 
     opt_paras = {"name": "WOA", "epoch": 5, "pop_size": 10}
-    model = MhaTuneRvfl(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
+    model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
                         optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
     model.fit(X, y)
     print(model.best_params)
     print(model.best_estimator)
 
     pred = model.predict(X)
-    assert MhaTuneRvfl.SUPPORTED_CLS_METRICS == model.SUPPORTED_CLS_METRICS
+    assert GfoRvflTuner.SUPPORTED_CLS_METRICS == model.SUPPORTED_CLS_METRICS
     assert len(pred) == X.shape[0]
