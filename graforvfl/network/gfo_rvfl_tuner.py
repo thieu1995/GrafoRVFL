@@ -17,6 +17,39 @@ from graforvfl import RvflRegressor, RvflClassifier
 
 
 class HyperparameterProblem(Problem):
+    """
+    This class defines the Hyper-parameter tuning problem that will be used for Mealpy library.
+
+    Parameters
+    ----------
+    bounds : from Mealpy library.
+
+    minmax : from Mealpy library.
+
+    X : array-like of shape (n_samples, n_features)
+        Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
+        ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
+
+    y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        True values for `X`.
+
+    model_class : RvflRegressor or RvflClassifier
+        The class definition of RVFL network for regression or classification problem.
+
+    metric_class : RegressionMetric or ClassificationMetric
+        The class definition of Performance Metrics for regression or classification problem.
+
+    obj_name : str
+        The name of the loss function used in network
+
+    cv : int, default=5
+        The k fold cross-validation method
+
+    seed: int, default=None
+        Determines random number generation for weights and bias initialization.
+        Pass an int for reproducible results across multiple function calls.
+    """
+
     def __init__(self, bounds=None, minmax="max", X=None, y=None, model_class=None, metric_class=None, obj_name=None, cv=5, seed=None, **kwargs):
         self.model_class = model_class
         self.model = None
@@ -51,6 +84,79 @@ class HyperparameterProblem(Problem):
 
 
 class GfoRvflTuner:
+    """
+    Defines the Gradient Free Optimization-based Random Vector Functional Link Network.
+
+    Parameters
+    ----------
+    problem_type : str, default="regression"
+        The problem type
+
+    bounds : from Mealpy library, default=None
+        The boundary for RVFL hyper-parameters. It can be an instance of these classes:
+        [FloatVar, BoolVar, StringVar, IntegerVar, PermutationVar, BinaryVar, MixedSetVar]
+
+    cv : int, default=5
+        The k fold cross-validation method.
+
+    scoring : str
+        The name of objective for the problem, also depend on the problem is classification and regression.
+
+    optimizer : str or instance of Optimizer class (from Mealpy library), default = "BaseGA"
+        The Metaheuristic Algorithm that use to solve the feature selection problem.
+        Current supported list, please check it here: https://github.com/thieu1995/mealpy.
+        If a custom optimizer is passed, make sure it is an instance of `Optimizer` class.
+
+    optimizer_paras : None or dict of parameter, default=None
+        The parameter for the `optimizer` object.
+        If `None`, the default parameters of optimizer is used (defined in https://github.com/thieu1995/mealpy.)
+        If `dict` is passed, make sure it has at least `epoch` and `pop_size` parameters.
+
+    verbose : bool, default=False
+        Whether to print progress messages to stdout.
+
+    seed: int, default=None
+        Determines random number generation for weights and bias initialization.
+        Pass an int for reproducible results across multiple function calls.
+
+    Examples
+    --------
+    >>> from sklearn.datasets import load_breast_cancer
+    >>> from mealpy import StringVar, IntegerVar
+    >>> from graforvfl import Data, GfoRvflTuner
+
+    >>> ## Load data object
+    >>> X, y = load_breast_cancer(return_X_y=True)
+    >>> data = Data(X, y)
+
+    >>> ## Split train and test
+    >>> data.split_train_test(test_size=0.2, random_state=2, inplace=True)
+    >>> print(data.X_train.shape, data.X_test.shape)
+
+    >>> ## Scaling dataset
+    >>> data.X_train, scaler_X = data.scale(data.X_train, scaling_methods=("standard", "minmax"))
+    >>> data.X_test = scaler_X.transform(data.X_test)
+
+    >>> data.y_train, scaler_y = data.encode_label(data.y_train)
+    >>> data.y_test = scaler_y.transform(data.y_test)
+
+    >>> # Design the boundary (parameters)
+    >>> my_bounds = [
+    >>>     IntegerVar(lb=2, ub=1000, name="size_hidden"),
+    >>>     StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu",
+    >>>         "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
+    >>>     StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
+    >>>         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
+    >>> ]
+
+    >>> opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
+    >>> model = GfoRvflTuner(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
+    >>>                   optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True, seed=42)
+    >>> model.fit(data.X_train, data.y_train)
+    >>> print(model.best_params)
+    >>> print(model.best_estimator)
+    >>> print(model.best_estimator.scores(data.X_test, data.y_test, list_methods=("PS", "RS", "NPV", "F1S", "F2S")))
+    """
 
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
     SUPPORTED_REG_METRICS = get_all_regression_metrics()
