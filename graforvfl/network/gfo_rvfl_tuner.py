@@ -201,9 +201,7 @@ class GfoRvflTuner:
         self.problem = HyperparameterProblem(self.bounds, self.minmax, X, y, self.network_class, self.metric_class,
                                              obj_name=self.scoring, cv=self.cv, log_to=self.verbose, seed=self.seed)
         self.optimizer.solve(self.problem, seed=self.seed)
-        print(self.optimizer.g_best.solution)
         self.best_params = self.optimizer.problem.decode_solution(self.optimizer.g_best.solution)
-        print(self.best_params)
         self.best_estimator = self.network_class(**self.best_params, seed=self.seed)
         self.best_estimator.fit(X, y)
         self.loss_train = self.optimizer.history.list_global_best_fit
