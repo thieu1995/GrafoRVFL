@@ -94,7 +94,7 @@ def soft_shrink(x, alpha=0.5):
 
 
 def hard_shrink(x, alpha=0.5):
-    return np.where(-alpha < x < alpha, x, 0)
+    return np.where((x > -alpha) & (x < alpha), x, 0)
 
 
 def softmin(x):
