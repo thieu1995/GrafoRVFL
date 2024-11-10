@@ -60,13 +60,66 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
     def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="MPI", alpha=0.5, seed=None):
         super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, trainer=trainer, alpha=alpha, seed=seed)
 
-    def score(self, X, y, method="RMSE"):
-        return self._BaseRVFL__score_reg(X, y, method)
+    def score(self, X, y):
+        """Return the real R2 (Coefficient of Determination) metric, not (Pearson’s Correlation Index)^2 like Scikit-Learn library.
 
-    def scores(self, X, y, list_methods=("MSE", "MAE")):
-        return self._BaseRVFL__scores_reg(X, y, list_methods)
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
+            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            True values for `X`.
+
+        Returns
+        -------
+        result : float
+            The result of selected metric
+        """
+        return self._BaseRVFL__score_reg(X, y, "R2")
+
+    def scores(self, X, y, list_metrics=("MSE", "MAE")):
+        """Return the list of regression metrics of the prediction.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
+            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            True values for `X`.
+
+        list_metrics : list, default=("MSE", "MAE")
+            You can get regression metrics from Permetrics library: https://permetrics.readthedocs.io/en/latest/pages/regression.html
+
+        Returns
+        -------
+        results : dict
+            The results of the list metrics
+        """
+        return self._BaseRVFL__scores_reg(X, y, list_metrics)
 
     def evaluate(self, y_true, y_pred, list_metrics=("MSE", "MAE")):
+        """Return the list of performance metrics of the prediction.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            True values for `X`.
+
+        y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            Predicted values for `X`.
+
+        list_metrics : list
+            You can get metrics from Permetrics library: https://github.com/thieu1995/permetrics
+
+        Returns
+        -------
+        results : dict
+            The results of the list metrics
+        """
         return self._BaseRVFL__evaluate_reg(y_true, y_pred, list_metrics)
 
 
@@ -137,7 +190,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
                 raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
         else:
             raise TypeError("Invalid y array type, it should be list, tuple or np.ndarray")
-        ohe_scaler = OneHotEncoder(sparse_output=False)
+        ohe_scaler = OneHotEncoder()
         ohe_scaler.fit(np.reshape(y, (-1, 1)))
         self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
         y_scaled = self.obj_scaler.transform(y)
@@ -159,11 +212,64 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         y_pred = self.predict_proba(X)
         return self.obj_scaler.inverse_transform(y_pred)
 
-    def score(self, X, y, method="AS"):
-        return self._BaseRVFL__score_cls(X, y, method)
+    def score(self, X, y):
+        """Return the real Accuracy Score metric
 
-    def scores(self, X, y, list_methods=("AS", "RS")):
-        return self._BaseRVFL__scores_cls(X, y, list_methods)
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
+            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            True values for `X`.
+
+        Returns
+        -------
+        result : float
+            The result of selected metric
+        """
+        return self._BaseRVFL__score_cls(X, y, "AS")
+
+    def scores(self, X, y, list_metrics=("AS", "RS")):
+        """Return the list of classification metrics of the prediction.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+           Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
+           ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+           True values for `X`.
+
+        list_metrics : list, default=("AS", "RS")
+           You can get classification metrics from Permetrics library: https://permetrics.readthedocs.io/en/latest/pages/classification.html
+
+        Returns
+        -------
+        results : dict
+           The results of the list metrics
+        """
+        return self._BaseRVFL__scores_cls(X, y, list_metrics)
 
     def evaluate(self, y_true, y_pred, list_metrics=("AS", "RS")):
+        """Return the list of classification performance metrics of the prediction.
+
+        Parameters
+        ----------
+        y_true : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            True values for `X`.
+
+        y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            Predicted values for `X`.
+
+        list_metrics : list
+            You can get classification metrics from Permetrics library: https://permetrics.readthedocs.io/en/latest/pages/classification.html
+
+        Returns
+        -------
+        results : dict
+            The results of the list metrics
+        """
         return self._BaseRVFL__evaluate_cls(y_true, y_pred, list_metrics)
