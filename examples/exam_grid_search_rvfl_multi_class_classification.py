@@ -17,7 +17,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Step 3: Define the parameter grid
 param_grid = {
-    'size_hidden': list(range(2, 1000)),
+    'size_hidden': list(range(2, 10)),
     'act_name': ["none", "relu", "leaky_relu", "celu", "prelu", "gelu",
                           "elu", "selu", "rrelu", "tanh", "sigmoid"],
     'weight_initializer': ["orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
