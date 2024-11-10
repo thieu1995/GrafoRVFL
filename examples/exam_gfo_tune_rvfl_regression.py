@@ -5,7 +5,7 @@
 # --------------------------------------------------%
 
 from sklearn.datasets import load_diabetes
-from mealpy import StringVar, IntegerVar
+from mealpy import StringVar, IntegerVar, FloatVar
 from graforvfl import Data, GfoRvflTuner
 
 
@@ -26,12 +26,15 @@ data.y_test = scaler_y.transform(data.y_test.reshape(-1, 1))
 
 # Design the boundary (parameters)
 my_bounds = [
-    IntegerVar(lb=2, ub=1000, name="size_hidden"),
-    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu",
-                          "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
-    StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
-                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
+    IntegerVar(lb=2, ub=40, name="size_hidden"),
+    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu", "selu", "rrelu", "tanh", "hard_tanh",
+        "sigmoid", "hard_sigmoid", "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
+        "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink", "softmin", "softmax", "log_softmax"), name="act_name"),
+    StringVar(valid_sets=("orthogonal",), name="weight_initializer"),
+    StringVar(valid_sets=("MPI", "L2"), name="trainer"),
+    FloatVar(lb=0.01, ub=100., name="alpha"),
 ]
+
 
 opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
 model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
@@ -39,4 +42,4 @@ model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring=
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
-print(model.best_estimator.scores(data.X_test, data.y_test, list_methods=("MSE", "RMSE", "MAPE", "NSE", "R2", "KGE")))
+print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("MSE", "RMSE", "MAPE", "NSE", "R2", "KGE")))

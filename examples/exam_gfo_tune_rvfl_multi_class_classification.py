@@ -5,7 +5,7 @@
 # --------------------------------------------------%
 
 from sklearn.datasets import load_iris
-from mealpy import StringVar, IntegerVar
+from mealpy import StringVar, IntegerVar, FloatVar
 from graforvfl import Data, GfoRvflTuner
 
 
@@ -26,11 +26,13 @@ data.y_test = scaler_y.transform(data.y_test)
 
 # Design the boundary (parameters)
 my_bounds = [
-    IntegerVar(lb=2, ub=1000, name="size_hidden"),
-    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu",
-                          "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
-    StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
-                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
+    IntegerVar(lb=2, ub=40, name="size_hidden"),
+    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu", "selu", "rrelu", "tanh", "hard_tanh",
+        "sigmoid", "hard_sigmoid", "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
+        "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink", "softmin", "softmax", "log_softmax"), name="act_name"),
+    StringVar(valid_sets=("orthogonal",), name="weight_initializer"),
+    StringVar(valid_sets=("MPI", "L2"), name="trainer"),
+    FloatVar(lb=0.01, ub=100., name="alpha"),
 ]
 
 opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
@@ -39,4 +41,4 @@ model = GfoRvflTuner(problem_type="classification", bounds=my_bounds, cv=3, scor
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
-print(model.best_estimator.scores(data.X_test, data.y_test, list_methods=("PS", "RS", "NPV", "F1S", "F2S")))
+print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("PS", "RS", "NPV", "F1S", "F2S")))
