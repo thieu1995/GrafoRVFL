@@ -81,13 +81,6 @@ class BaseRVFL(BaseEstimator):
         else:
             raise ValueError(f"weight_initializer should be a string and belongs to {self.SUPPORTED_WEIGHT_INITIALIZER}")
 
-    @staticmethod
-    def _check_method(method=None, list_supported_methods=None):
-        if type(method) is str:
-            return boundary_controller.check_str("method", method, list_supported_methods)
-        else:
-            raise ValueError(f"method should be a string and belongs to {list_supported_methods}")
-
     def _trained(self, trainer="MPI", D=None, y=None):
         if trainer == "MPI":        # Standard OLS (alpha = 0)
             return np.linalg.pinv(D) @ y
@@ -143,31 +136,31 @@ class BaseRVFL(BaseEstimator):
         cm = ClassificationMetric(y_true, y_pred)
         return cm.get_metrics_by_list_names(list_metrics)
 
-    def __score_reg(self, X, y, method="RMSE"):
-        method = self._check_method(method, list(self.SUPPORTED_REG_METRICS.keys()))
+    def __score_reg(self, X, y, metric="RMSE"):
         y_pred = self.predict(X)
-        return RegressionMetric(y, y_pred).get_metric_by_name(method)[method]
+        return RegressionMetric(y, y_pred).get_metric_by_name(metric)[metric]
 
-    def __scores_reg(self, X, y, list_methods=("MSE", "MAE")):
+    def __scores_reg(self, X, y, list_metrics=("MSE", "MAE")):
         y_pred = self.predict(X)
-        return self.__evaluate_reg(y_true=y, y_pred=y_pred, list_metrics=list_methods)
+        return self.__evaluate_reg(y_true=y, y_pred=y_pred, list_metrics=list_metrics)
 
-    def __score_cls(self, X, y, method="AS"):
-        method = self._check_method(method, list(self.SUPPORTED_CLS_METRICS.keys()))
+    def __score_cls(self, X, y, metric="AS"):
         return_prob = False
         if self.n_labels > 2:
-            if method in self.CLS_OBJ_LOSSES:
+            if metric in self.CLS_OBJ_LOSSES:
                 return_prob = True
         if return_prob:
             y_pred = self.predict_proba(X)
         else:
             y_pred = self.predict(X)
         cm = ClassificationMetric(y_true=y, y_pred=y_pred)
-        return cm.get_metric_by_name(method)[method]
+        return cm.get_metric_by_name(metric)[metric]
 
-    def __scores_cls(self, X, y, list_methods=("AS", "RS")):
-        list_errors = list(set(list_methods) & set(self.CLS_OBJ_LOSSES))
-        list_scores = list((set(self.SUPPORTED_CLS_METRICS.keys()) - set(self.CLS_OBJ_LOSSES)) & set(list_methods))
+    def __scores_cls(self, X, y, list_metrics=("AS", "RS")):
+        list_errors = list(set(list_metrics) & set(self.CLS_OBJ_LOSSES))
+        print(list_errors)
+        # list_scores = list((set(self.SUPPORTED_CLS_METRICS.keys()) - set(self.CLS_OBJ_LOSSES)) & set(list_metrics))
+        # print(list_scores)
         t1 = {}
         if len(list_errors) > 0:
             return_prob = False
@@ -179,72 +172,19 @@ class BaseRVFL(BaseEstimator):
                 y_pred = self.predict(X)
             t1 = self.__evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_errors)
         y_pred = self.predict(X)
-        t2 = self.__evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_scores)
+        t2 = self.__evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_metrics)
         return {**t2, **t1}
 
+    def score(self, X, y):
+        """Default interface for score function"""
+        pass
+
+    def scores(self, X, y, list_metrics=None):
+        """Default interface for scores function"""
+        pass
+
     def evaluate(self, y_true, y_pred, list_metrics=None):
-        """Return the list of performance metrics of the prediction.
-
-        Parameters
-        ----------
-        y_true : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            True values for `X`.
-
-        y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            Predicted values for `X`.
-
-        list_metrics : list
-            You can get metrics from Permetrics library: https://github.com/thieu1995/permetrics
-
-        Returns
-        -------
-        results : dict
-            The results of the list metrics
-        """
-        pass
-
-    def score(self, X, y, method=None):
-        """Return the metric of the prediction.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
-            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
-
-        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            True values for `X`.
-
-        method : str, default="RMSE"
-            You can get metrics from Permetrics library: https://github.com/thieu1995/permetrics
-
-        Returns
-        -------
-        result : float
-            The result of selected metric
-        """
-        pass
-
-    def scores(self, X, y, list_methods=None):
-        """Return the list of metrics of the prediction.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Test samples. For some estimators this may be a precomputed kernel matrix or a list of generic objects instead with shape
-            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted`` is the number of samples used in the fitting for the estimator.
-
-        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            True values for `X`.
-
-        list_methods : list, default=("MSE", "MAE")
-            You can get metrics from Permetrics library: https://github.com/thieu1995/permetrics
-
-        Returns
-        -------
-        results : dict
-            The results of the list metrics
-        """
+        """Default interface for evaluate function"""
         pass
 
     def save_loss_train(self, save_path="history", filename="loss.csv"):
