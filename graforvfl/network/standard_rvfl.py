@@ -195,8 +195,8 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
         y_scaled = self.obj_scaler.transform(y)
 
-        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input))
-        self.weights["bh"] = self.weight_randomer(self.size_hidden).flatten()
+        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input), seed=self.seed)
+        self.weights["bh"] = self.weight_randomer(self.size_hidden, seed=self.seed).flatten()
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         self.weights["Wioho"] = self._trained(self.trainer, D, y_scaled)

@@ -158,9 +158,6 @@ class BaseRVFL(BaseEstimator):
 
     def __scores_cls(self, X, y, list_metrics=("AS", "RS")):
         list_errors = list(set(list_metrics) & set(self.CLS_OBJ_LOSSES))
-        print(list_errors)
-        # list_scores = list((set(self.SUPPORTED_CLS_METRICS.keys()) - set(self.CLS_OBJ_LOSSES)) & set(list_metrics))
-        # print(list_scores)
         t1 = {}
         if len(list_errors) > 0:
             return_prob = False

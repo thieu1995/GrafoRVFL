@@ -58,13 +58,12 @@ class HyperparameterProblem(Problem):
         self.metric_class = metric_class
         self.obj_name = obj_name
         self.cv = cv
-        self.seed = seed
-        self.kf = KFold(n_splits=cv, shuffle=True, random_state=self.seed)
-        super().__init__(bounds, minmax, **kwargs)
+        self.kf = KFold(n_splits=cv, shuffle=True, random_state=seed)
+        super().__init__(bounds, minmax, **{**kwargs, "seed":seed})
 
     def obj_func(self, x):
         x_decoded = self.decode_solution(x)
-        self.model = self.model_class(**x_decoded)
+        self.model = self.model_class(**x_decoded, seed=self.seed)
         scores = []
         # Perform custom cross-validation
         for train_idx, test_idx in self.kf.split(self.X):
@@ -190,7 +189,7 @@ class GfoRvflTuner:
             if type(optimizer_paras) is dict:
                 return opt_class(**optimizer_paras)
             else:
-                return opt_class(epoch=500, pop_size=50)
+                return opt_class(epoch=250, pop_size=20)
         elif isinstance(optimizer, Optimizer):
             if type(optimizer_paras) is dict:
                 return optimizer.set_parameters(optimizer_paras)
@@ -202,8 +201,10 @@ class GfoRvflTuner:
         self.problem = HyperparameterProblem(self.bounds, self.minmax, X, y, self.network_class, self.metric_class,
                                              obj_name=self.scoring, cv=self.cv, log_to=self.verbose, seed=self.seed)
         self.optimizer.solve(self.problem, seed=self.seed)
+        print(self.optimizer.g_best.solution)
         self.best_params = self.optimizer.problem.decode_solution(self.optimizer.g_best.solution)
-        self.best_estimator = self.network_class(**self.best_params)
+        print(self.best_params)
+        self.best_estimator = self.network_class(**self.best_params, seed=self.seed)
         self.best_estimator.fit(X, y)
         self.loss_train = self.optimizer.history.list_global_best_fit
         return self
