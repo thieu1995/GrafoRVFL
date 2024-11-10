@@ -28,7 +28,7 @@ class BaseRVFL(BaseEstimator):
         The activation of the hidden layer. The supported values are:
         ["none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu", "selu", "rrelu", "tanh", "hard_tanh",
         "sigmoid", "hard_sigmoid", "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
-        "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink", "softmin", "softmax", "log_softmax" }
+        "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink", "softmin", "softmax", "log_softmax" ]
 
     weight_initializer : str, default="random_uniform"
         The weight initialization methods. The supported methods are:
@@ -38,9 +38,8 @@ class BaseRVFL(BaseEstimator):
 
     trainer : str, default = "MPI"
         The utilized method for training weights of hidden-output layer and weights of input-output layer.
-            + MPI: Moore-Penrose inversion
-            + OLS: Ordinary Least Squares (OLS) without regularization
-            + L2: OLS regression with regularization
+            + MPI: Moore-Penrose inversion (Ordinary Least Squares without regularization)
+            + L2: Ordinary Least Squares (OLS) regression with regularization
 
     alpha : float (Optional), default=0.5
         The penalty value for L2 method. Only effect when `trainer`="L2".
@@ -57,6 +56,10 @@ class BaseRVFL(BaseEstimator):
         "orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"
     ]
+    SUPPORTED_ACTIVATION = ["none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu", "selu", "rrelu",
+                            "tanh", "hard_tanh", "sigmoid", "hard_sigmoid", "log_sigmoid", "silu", "swish",
+                            "hard_swish", "soft_plus", "mish", "soft_sign", "tanh_shrink", "soft_shrink",
+                            "hard_shrink", "softmin", "softmax", "log_softmax"]
 
     def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="MPI", alpha=0.5, seed=None):
         self.size_hidden = size_hidden
@@ -85,14 +88,11 @@ class BaseRVFL(BaseEstimator):
         else:
             raise ValueError(f"method should be a string and belongs to {list_supported_methods}")
 
-    def _trained(self, trainer="OLS", D=None, y=None):
-        if trainer == "MPI":
+    def _trained(self, trainer="MPI", D=None, y=None):
+        if trainer == "MPI":        # Standard OLS (alpha = 0)
             return np.linalg.pinv(D) @ y
-        elif trainer == "L2":
+        else:   # trainer == "L2":
             ridge_model = Ridge(alpha=self.alpha, fit_intercept=False, random_state=self.seed)
-            return ridge_model.fit(D, y).coef_.T
-        else:
-            ridge_model = Ridge(alpha=0.0, fit_intercept=False, random_state=self.seed)
             return ridge_model.fit(D, y).coef_.T
 
     def fit(self, X, y):
