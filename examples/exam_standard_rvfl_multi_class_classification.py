@@ -24,7 +24,7 @@ data.y_train, scaler_y = data.encode_label(data.y_train)
 data.y_test = scaler_y.transform(data.y_test)
 
 ## Create network
-model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5, seed=42)
+model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="L2", alpha=0.5, seed=42)
 
 ## Train the network
 model.fit(X=data.X_train, y=data.y_train)
@@ -34,6 +34,6 @@ y_pred = model.predict(data.X_test)
 print(y_pred)
 
 ## Calculate some metrics
-print(model.score(X=data.X_test, y=data.y_test, method="AS"))
-print(model.scores(X=data.X_test, y=data.y_test, list_methods=["PS", "RS", "NPV", "F1S", "F2S"]))
+print(model.score(X=data.X_test, y=data.y_test))
+print(model.scores(X=data.X_test, y=data.y_test, list_metrics=["PS", "RS", "NPV", "F1S", "F2S"]))
 print(model.evaluate(y_true=data.y_test, y_pred=y_pred, list_metrics=["F2S", "CKS", "FBS"]))

@@ -24,7 +24,7 @@ data.y_train, scaler_y = data.scale(data.y_train, scaling_methods=("standard", "
 data.y_test = scaler_y.transform(data.y_test.reshape(-1, 1))
 
 ## Create network
-model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="OLS", alpha=0.5, seed=42)
+model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="L2", alpha=0.5, seed=42)
 
 ## Train the network
 model.fit(data.X_train, data.y_train)
@@ -34,6 +34,6 @@ y_pred = model.predict(data.X_test)
 print(y_pred)
 
 ## Calculate some metrics
-print(model.score(X=data.X_test, y=data.y_test, method="RMSE"))
-print(model.scores(X=data.X_test, y=data.y_test, list_methods=["R2", "NSE", "MAPE"]))
+print(model.score(X=data.X_test, y=data.y_test))
+print(model.scores(X=data.X_test, y=data.y_test, list_metrics=["R2", "NSE", "MAPE"]))
 print(model.evaluate(y_true=data.y_test, y_pred=y_pred, list_metrics=["R2", "NSE", "MAPE", "NNSE"]))
