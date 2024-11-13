@@ -6,7 +6,7 @@ Installation
 
 .. code-block:: bash
 
-	$ pip install graforvfl==1.1.0
+	$ pip install graforvfl==1.2.0
 
 
 * Install directly from source code.
@@ -151,7 +151,7 @@ Supported functions in `model` object
 
 	## Calculate metrics using score or scores functions.
 	print(model.score(data.X_test, data.y_test, method="MAE"))
-	print(model.scores(data.X_test, data.y_test, list_methods=["MAPE", "NNSE", "KGE", "MASE", "R2", "R", "R2S"]))
+	print(model.scores(data.X_test, data.y_test, list_metrics=["MAPE", "NNSE", "KGE", "MASE", "R2", "R", "R2S"]))
 
 	## Calculate metrics using evaluate function
 	print(model.evaluate(data.y_test, y_pred, list_metrics=("MSE", "RMSE", "MAPE", "NSE")))
