@@ -4,6 +4,93 @@
 #       Github: https://github.com/thieu1995        %                         
 # --------------------------------------------------%
 
+"""
+This module provides a comprehensive collection of activation functions used in machine learning and deep learning.
+Activation functions play a critical role in neural networks by introducing non-linearity, enabling the network to
+learn and approximate complex patterns in data.
+
+Functions:
+----------
+- none(x):
+    A no-op function that returns the input as is.
+
+- relu(x):
+    Rectified Linear Unit (ReLU), returns the input if positive, otherwise returns zero.
+
+- leaky_relu(x, alpha=0.01):
+    Leaky ReLU allows a small gradient when the input is negative.
+
+- celu(x, alpha=1.0):
+    Continuously Differentiable Exponential Linear Unit, a smooth alternative to ReLU.
+
+- prelu(x, alpha=0.5):
+    Parametric ReLU, where the slope for negative inputs is a learnable parameter.
+
+- gelu(x, alpha=0.044715):
+    Gaussian Error Linear Unit, combines tanh approximation for smooth activation.
+
+- elu(x, alpha=1):
+    Exponential Linear Unit, returns an exponential for negative inputs.
+
+- selu(x, alpha=1.67326324, scale=1.05070098):
+    Scaled Exponential Linear Unit, normalizes outputs for self-normalizing networks.
+
+- rrelu(x, lower=1./8, upper=1./3):
+    Randomized Leaky ReLU, introduces randomized slopes for negative inputs.
+
+- tanh(x):
+    Hyperbolic tangent function, outputs values between -1 and 1.
+
+- hard_tanh(x, lower=-1., upper=1.):
+    A clipped version of the tanh function.
+
+- sigmoid(x):
+    Logistic sigmoid function, outputs values between 0 and 1.
+
+- hard_sigmoid(x, lower=-2.5, upper=2.5):
+    A piecewise linear approximation of the sigmoid function.
+
+- log_sigmoid(x):
+    Logarithmic sigmoid function for numerical stability.
+
+- swish(x):
+    Swish (or SiLU), smooth and bounded non-linearity.
+
+- hard_swish(x, lower=-3., upper=3.):
+    A piecewise linear approximation of the swish function.
+
+- soft_plus(x, beta=1.0):
+    Smooth approximation of the ReLU function.
+
+- mish(x, beta=1.0):
+    Mish activation, smooth non-monotonic function.
+
+- soft_sign(x):
+    Smooth approximation of the sign function.
+
+- tanh_shrink(x):
+    Difference between input and tanh, providing a shrinkage effect.
+
+- soft_shrink(x, alpha=0.5):
+    Threshold-based shrinkage operator with soft boundaries.
+
+- hard_shrink(x, alpha=0.5):
+    Hard thresholding function with a predefined alpha.
+
+- softmin(x):
+    Normalizes the negative inputs into a probability distribution.
+
+- softmax(x):
+    Converts inputs into a probability distribution over multiple classes.
+
+- log_softmax(x):
+    Numerically stable logarithmic version of softmax.
+
+Aliases:
+--------
+- silu(x): Alias for swish(x).
+"""
+
 import numpy as np
 
 

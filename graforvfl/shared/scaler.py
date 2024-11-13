@@ -58,8 +58,8 @@ class LabelEncoder:
         """
         Fit label encoder to a given set of labels.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         y : array-like
             Labels to encode.
         """
@@ -70,8 +70,8 @@ class LabelEncoder:
         """
         Transform labels to encoded integer labels.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         y : array-like
             Labels to encode.
 
@@ -104,13 +104,13 @@ class LabelEncoder:
         """
         Transform integer labels to original labels.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         y : array-like
             Encoded integer labels.
 
-        Returns:
-        --------
+        Returns
+        -------
         original_labels : array-like
             Original labels.
         """
