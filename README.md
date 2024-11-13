@@ -3,7 +3,7 @@
 
 ---
 
-[![GitHub release](https://img.shields.io/badge/release-1.1.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
+[![GitHub release](https://img.shields.io/badge/release-1.2.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
 [![Wheel](https://img.shields.io/pypi/wheel/gensim.svg)](https://pypi.python.org/pypi/graforvfl) 
 [![PyPI version](https://badge.fury.io/py/graforvfl.svg)](https://badge.fury.io/py/graforvfl)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/graforvfl.svg)
@@ -22,8 +22,7 @@
 
 GrafoRVFL is an open-source library in Python that employs gradient-free optimization (GA, PSO, WOA, TLO, DE, ...) to 
 optimize Random Vector Functional Link Networks. It is entirely implemented based on Numpy and fully compatible 
-with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tune the hyper-parameters of network 
-or optimize weights in the network using gradient-free optimizers.
+with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tune the hyper-parameters of network in the network using gradient-free optimizers.
 
 
 * **Free software:** GNU General Public License (GPL) V3 license
@@ -38,7 +37,7 @@ or optimize weights in the network using gradient-free optimizers.
 * Learn more about Random Vector Functional Link from [this paper](https://doi.org/10.1016/j.ins.2015.09.025)
 
 * Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from 
-[this paper](https://doi.org/10.1109/TCSS.2022.3146974)
+[this paper](https://doi.org/10.1016/j.neucom.2018.07.080)
 
 
 Please include these citations if you plan to use this library:
@@ -141,7 +140,7 @@ model = GfoRvflTuner(problem_type="classification", bounds=my_bounds, cv=3, scor
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
-print(model.best_estimator.scores(data.X_test, data.y_test, list_methods=("PS", "RS", "NPV", "F1S", "F2S")))
+print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("PS", "RS", "NPV", "F1S", "F2S")))
 ```
 
 # Official channels 
