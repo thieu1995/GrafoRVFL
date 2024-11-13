@@ -154,7 +154,7 @@ class GfoRvflTuner:
     >>> model.fit(data.X_train, data.y_train)
     >>> print(model.best_params)
     >>> print(model.best_estimator)
-    >>> print(model.best_estimator.scores(data.X_test, data.y_test, list_methods=("PS", "RS", "NPV", "F1S", "F2S")))
+    >>> print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("PS", "RS", "NPV", "F1S", "F2S")))
     """
 
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
@@ -277,6 +277,21 @@ class GfoRvflTuner:
 
     @staticmethod
     def load_model(load_path="history", filename="network.pkl"):
+        """
+        Load a saved model from a pickle file.
+
+        Parameters
+        ----------
+        load_path : str, default="history"
+            Directory containing the saved file.
+        filename : str, default="network.pkl"
+            Name of the file (must end with `.pkl`).
+
+        Returns
+        -------
+        model : BaseRVFL
+            Loaded model instance.
+        """
         if filename[-4:] != ".pkl":
             filename += ".pkl"
         return pickle.load(open(f"{load_path}/{filename}", 'rb'))
