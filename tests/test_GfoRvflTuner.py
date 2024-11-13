@@ -22,7 +22,8 @@ def test_GfoRvflTuner_class():
         StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu",
                               "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
         StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
-                              "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
+                              "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"),
+                  name="weight_initializer")
     ]
 
     opt_paras = {"name": "WOA", "epoch": 5, "pop_size": 10}
