@@ -1,7 +1,16 @@
 
-# Version 1.1.0 
+# Version 1.2.0
 
-+ Rename MhaTuneRvfl class to GfoRvflTuner class
++ Fix bugs in `seed` value, `OneHotEncoder` class, and `hard_shrink` function.
++ Update `trainer` parameter for model
++ Rename `list_methods` parameter to `list_metrics` parameter
++ Update examples, tests, and documentation.
+
+------------------------------------------------------------------------------
+
+# Version 1.1.0
+
++ Rename `MhaTuneRvfl` class to `GfoRvflTuner` class
 + Add seed parameter to all classes.
 + Add examples with GridSearchCV
 + Update PerMetrics and Mealpy dependencies
