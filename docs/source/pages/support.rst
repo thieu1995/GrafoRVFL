@@ -4,7 +4,7 @@ Citation Request
 
 * Learn more about Random Vector Functional Link from `paper 01 <https://doi.org/10.1016/j.ins.2015.09.025>`_
 
-* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from `paper 02 <https://doi.org/10.1109/TCSS.2022.3146974>`_
+* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from `paper 02 <https://doi.org/10.1016/j.neucom.2018.07.080>`_
 
 * Learn more about on how to use Gradient Free Optimization to optimize the weights of RVFL networks from `paper 03 <https://doi.org/10.1109/SOCA.2018.00014>`_.
 
