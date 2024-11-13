@@ -17,21 +17,22 @@ from graforvfl.shared.scorer import get_all_regression_metrics, get_all_classifi
 
 class BaseRVFL(BaseEstimator):
     """
-    This class defines the general Random Vector Functional Link (RVFL) networks
+    This class defines the general Random Vector Functional Link (RVFL) network.
+    It is a single-hidden layer network with direct connection between input and output.
 
     Parameters
     ----------
     size_hidden : int, default=10
-        The number of hidden nodes
+        Number of nodes in the hidden layer.
 
     act_name : str, default="sigmoid"
-        The activation of the hidden layer. The supported values are:
+        Name of the activation function for the hidden layer. Supported values include:
         ["none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu", "selu", "rrelu", "tanh", "hard_tanh",
         "sigmoid", "hard_sigmoid", "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
         "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink", "softmin", "softmax", "log_softmax" ]
 
     weight_initializer : str, default="random_uniform"
-        The weight initialization methods. The supported methods are:
+        Method for initializing weights (input-hidden weights). Supported methods include:
         ["orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"]
         For definition of these methods, please check it at: https://keras.io/api/layers/initializers/
@@ -42,11 +43,24 @@ class BaseRVFL(BaseEstimator):
             + L2: Ordinary Least Squares (OLS) regression with regularization
 
     alpha : float (Optional), default=0.5
-        The penalty value for L2 method. Only effect when `trainer`="L2".
+        Regularization parameter for L2 training. Effective only when `trainer="L2"`.
 
     seed: int, default=None
         Determines random number generation for weights and bias initialization.
         Pass an int for reproducible results across multiple function calls.
+
+    Attributes
+    ----------
+    weights : dict
+        Dictionary containing the initialized weights for hidden layers and output layers.
+    act_func : callable
+        The activation function applied to the hidden layer.
+    size_input : int
+        Number of features in the input data.
+    size_output : int
+        Number of outputs based on the target data dimensionality.
+    loss_train : list
+        Stores the loss history during training, if applicable.
     """
 
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
@@ -89,6 +103,22 @@ class BaseRVFL(BaseEstimator):
             return ridge_model.fit(D, y).coef_.T
 
     def fit(self, X, y):
+        """
+        Fit the RVFL model to the training data.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Training input features.
+
+        y : ndarray of shape (n_samples,) or (n_samples, n_outputs)
+            Target values.
+
+        Returns
+        -------
+        self : BaseRVFL
+            The fitted model.
+        """
         self.size_input = X.shape[1]
         if type(y) in (list, tuple, np.ndarray):
             y = np.squeeze(np.asarray(y))
@@ -108,24 +138,74 @@ class BaseRVFL(BaseEstimator):
         return self
 
     def predict(self, X):
+        """
+        Predict target values using the fitted RVFL model.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Input data.
+
+        Returns
+        -------
+        y_pred : ndarray
+            Predicted target values.
+        """
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         y_pred = D @ self.weights["Wioho"]
         return y_pred
 
     def predict_proba(self, X):
+        """
+        Predict probabilities (or scores) for classification tasks.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Input data.
+
+        Returns
+        -------
+        y_pred : ndarray
+            Predicted probabilities or scores.
+        """
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         y_pred = D @ self.weights["Wioho"]
         return y_pred
 
     def get_weights(self):
+        """
+        Retrieve the current weights of the RVFL model.
+
+        Returns
+        -------
+        weights : dict
+            Dictionary containing the current model weights.
+        """
         return self.weights
 
     def set_weights(self, weights):
+        """
+        Set the weights for the RVFL model.
+
+        Parameters
+        ----------
+        weights : dict
+            Dictionary containing the weights to set.
+        """
         self.weights = weights
 
     def get_weights_size(self):
+        """
+        Calculate the total number of parameters in the model.
+
+        Returns
+        -------
+        size : int
+            Total number of parameters across all weights.
+        """
         return np.sum([item.size for item in self.weights.values()])
 
     def __evaluate_reg(self, y_true, y_pred, list_metrics=("MSE", "MAE")):
@@ -206,11 +286,16 @@ class BaseRVFL(BaseEstimator):
 
         Parameters
         ----------
-        y_true : ground truth data
-        y_pred : predicted output
-        list_metrics : list of evaluation metrics
-        save_path : saved path (relative path, consider from current executed script path)
-        filename : name of the file, needs to have ".csv" extension
+        y_true : ndarray
+            Ground truth target values.
+        y_pred : ndarray
+            Predicted target values.
+        list_metrics : list of str, default=("RMSE", "MAE")
+            List of metrics to calculate.
+        save_path : str, default="history"
+            Directory to save the file.
+        filename : str, default="metrics.csv"
+            Name of the file (must end with `.csv`).
         """
         Path(save_path).mkdir(parents=True, exist_ok=True)
         results = self.evaluate(y_true, y_pred, list_metrics)
@@ -223,10 +308,14 @@ class BaseRVFL(BaseEstimator):
 
         Parameters
         ----------
-        X : The features data, nd.ndarray
-        y_true : The ground truth data
-        save_path : saved path (relative path, consider from current executed script path)
-        filename : name of the file, needs to have ".csv" extension
+        X : ndarray
+            Input features.
+        y_true : ndarray
+            Ground truth target values.
+        save_path : str, default="history"
+            Directory to save the file.
+        filename : str, default="y_predicted.csv"
+            Name of the file (must end with `.csv`).
         """
         Path(save_path).mkdir(parents=True, exist_ok=True)
         y_pred = self.predict(X)
@@ -239,8 +328,10 @@ class BaseRVFL(BaseEstimator):
 
         Parameters
         ----------
-        save_path : saved path (relative path, consider from current executed script path)
-        filename : name of the file, needs to have ".pkl" extension
+        save_path : str, default="history"
+            Directory to save the file.
+        filename : str, default="network.pkl"
+            Name of the file (must end with `.pkl`).
         """
         Path(save_path).mkdir(parents=True, exist_ok=True)
         if filename[-4:] != ".pkl":
@@ -249,6 +340,21 @@ class BaseRVFL(BaseEstimator):
 
     @staticmethod
     def load_model(load_path="history", filename="network.pkl"):
+        """
+        Load a saved model from a pickle file.
+
+        Parameters
+        ----------
+        load_path : str, default="history"
+            Directory containing the saved file.
+        filename : str, default="network.pkl"
+            Name of the file (must end with `.pkl`).
+
+        Returns
+        -------
+        model : BaseRVFL
+            Loaded model instance.
+        """
         if filename[-4:] != ".pkl":
             filename += ".pkl"
         return pickle.load(open(f"{load_path}/{filename}", 'rb'))
