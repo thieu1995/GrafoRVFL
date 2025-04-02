@@ -27,8 +27,8 @@ def test_GfoRvflCV_class():
     ]
 
     model = GfoRvflCV(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
-                         optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 5, "pop_size": 10},
-                         seed=42, verbose=True)
+                      optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 5, "pop_size": 10},
+                      seed=42, verbose=True)
     model.fit(X, y)
     print(model.best_params)
     print(model.best_estimator)
