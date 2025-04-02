@@ -14,8 +14,7 @@ def test_RvflRegressor_class():
     X = np.random.rand(100, 6)
     y = np.random.randint(0, 2, size=100)
 
-    model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal",
-                          trainer="MPI", seed=42)
+    model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", reg_alpha=0.1, seed=42)
     model.fit(X, y)
     pred = model.predict(X)
     assert RvflRegressor.SUPPORTED_CLS_METRICS == model.SUPPORTED_CLS_METRICS
