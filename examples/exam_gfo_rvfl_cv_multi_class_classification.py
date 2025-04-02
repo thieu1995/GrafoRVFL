@@ -1,16 +1,15 @@
 #!/usr/bin/env python
-# Created by "Thieu" at 22:17, 04/12/2023 ----------%                                                                               
+# Created by "Thieu" at 22:19, 04/12/2023 ----------%                                                                               
 #       Email: nguyenthieu2102@gmail.com            %                                                    
 #       Github: https://github.com/thieu1995        %                         
 # --------------------------------------------------%
 
-from sklearn.datasets import load_breast_cancer
-from mealpy import StringVar, IntegerVar, FloatVar
-from graforvfl import Data, GfoRvflTuner
+from sklearn.datasets import load_iris
+from graforvfl import Data, GfoRvflCV, StringVar, IntegerVar, FloatVar
 
 
 ## Load data object
-X, y = load_breast_cancer(return_X_y=True)
+X, y = load_iris(return_X_y=True)
 data = Data(X, y)
 
 ## Split train and test
@@ -31,13 +30,12 @@ my_bounds = [
         "sigmoid", "hard_sigmoid", "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
         "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink", "softmin", "softmax", "log_softmax"), name="act_name"),
     StringVar(valid_sets=("orthogonal",), name="weight_initializer"),
-    StringVar(valid_sets=("MPI", "L2"), name="trainer"),
-    FloatVar(lb=0.01, ub=100., name="alpha"),
+    FloatVar(lb=0, ub=10., name="reg_alpha"),
 ]
 
-opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-model = GfoRvflTuner(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
-                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True, seed=42)
+model = GfoRvflCV(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
+                      optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 10, "pop_size": 20},
+                     verbose=True, seed=42)
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)

@@ -5,13 +5,12 @@
 # --------------------------------------------------%
 
 import numpy as np
-from mealpy import IntegerVar, StringVar
-from graforvfl import GfoRvflTuner
+from graforvfl import GfoRvflCV, IntegerVar, StringVar, FloatVar
 
 np.random.seed(42)
 
 
-def test_GfoRvflTuner_class():
+def test_GfoRvflCV_class():
     X = np.random.uniform(low=0.0, high=1.0, size=(100, 5))
     noise = np.random.normal(loc=0.0, scale=0.1, size=(100, 5))
     y = 2 * X + 1 + noise
@@ -23,16 +22,17 @@ def test_GfoRvflTuner_class():
                               "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
         StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
                               "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"),
-                  name="weight_initializer")
+                  name="weight_initializer"),
+        FloatVar(lb=0.0, ub=1.0, name="reg_alpha")
     ]
 
-    opt_paras = {"name": "WOA", "epoch": 5, "pop_size": 10}
-    model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
-                         optimizer="OriginalWOA", optimizer_paras=opt_paras, seed=42, verbose=True)
+    model = GfoRvflCV(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
+                         optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 5, "pop_size": 10},
+                         seed=42, verbose=True)
     model.fit(X, y)
     print(model.best_params)
     print(model.best_estimator)
 
     pred = model.predict(X)
-    assert GfoRvflTuner.SUPPORTED_CLS_METRICS == model.SUPPORTED_CLS_METRICS
+    assert GfoRvflCV.SUPPORTED_CLS_METRICS == model.SUPPORTED_CLS_METRICS
     assert len(pred) == X.shape[0]

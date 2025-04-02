@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import KFold
-from mealpy import Problem, get_optimizer_by_name, Optimizer
+from mealpy import Problem, get_optimizer_by_name, Optimizer, IntegerVar, StringVar, FloatVar
 from permetrics import ClassificationMetric, RegressionMetric
 from graforvfl.shared.scorer import get_all_classification_metrics, get_all_regression_metrics
 from graforvfl.shared import boundary_controller
@@ -42,15 +42,19 @@ class HyperparameterProblem(Problem):
     obj_name : str
         The name of the loss function used in network
 
-    cv : int, default=5
+    cv : int, default=None
         The k fold cross-validation method
+
+    shuffle: bool, default=True
+        Shuffle or not the dataset when performs k-fold cross validation.
 
     seed: int, default=None
         Determines random number generation for weights and bias initialization.
         Pass an int for reproducible results across multiple function calls.
     """
 
-    def __init__(self, bounds=None, minmax="max", X=None, y=None, model_class=None, metric_class=None, obj_name=None, cv=5, seed=None, **kwargs):
+    def __init__(self, bounds=None, minmax="max", X=None, y=None, model_class=None,
+                 metric_class=None, obj_name=None, cv=None, shuffle=True, seed=None, **kwargs):
         self.model_class = model_class
         self.model = None
         self.X = X
@@ -58,7 +62,10 @@ class HyperparameterProblem(Problem):
         self.metric_class = metric_class
         self.obj_name = obj_name
         self.cv = cv
-        self.kf = KFold(n_splits=cv, shuffle=True, random_state=seed)
+        if cv is None or cv < 2:
+            self.cv = 2
+        self.shuffle = shuffle
+        self.kf = KFold(n_splits=self.cv, shuffle=shuffle, random_state=seed)
         super().__init__(bounds, minmax, **{**kwargs, "seed":seed})
 
     def obj_func(self, x):
@@ -82,7 +89,7 @@ class HyperparameterProblem(Problem):
         return np.mean(scores)
 
 
-class GfoRvflTuner:
+class GfoRvflCV:
     """
     Defines the Gradient Free Optimization-based Random Vector Functional Link Network.
 
@@ -95,19 +102,19 @@ class GfoRvflTuner:
         The boundary for RVFL hyper-parameters. It can be an instance of these classes:
         [FloatVar, BoolVar, StringVar, IntegerVar, PermutationVar, BinaryVar, MixedSetVar]
 
-    cv : int, default=5
+    cv : int, default=None
         The k fold cross-validation method.
 
     scoring : str
         The name of objective for the problem, also depend on the problem is classification and regression.
 
-    optimizer : str or instance of Optimizer class (from Mealpy library), default = "BaseGA"
+    optim : str or instance of Optimizer class (from Mealpy library), default = "BaseGA"
         The Metaheuristic Algorithm that use to solve the feature selection problem.
         Current supported list, please check it here: https://github.com/thieu1995/mealpy.
         If a custom optimizer is passed, make sure it is an instance of `Optimizer` class.
 
-    optimizer_paras : None or dict of parameter, default=None
-        The parameter for the `optimizer` object.
+    optim_params : None or dict of parameter, default=None
+        The parameter for the `optim` object.
         If `None`, the default parameters of optimizer is used (defined in https://github.com/thieu1995/mealpy.)
         If `dict` is passed, make sure it has at least `epoch` and `pop_size` parameters.
 
@@ -121,8 +128,7 @@ class GfoRvflTuner:
     Examples
     --------
     >>> from sklearn.datasets import load_breast_cancer
-    >>> from mealpy import StringVar, IntegerVar
-    >>> from graforvfl import Data, GfoRvflTuner
+    >>> from graforvfl import Data, GfoRvflCV, StringVar, IntegerVar, FloatVar
 
     >>> ## Load data object
     >>> X, y = load_breast_cancer(return_X_y=True)
@@ -149,8 +155,8 @@ class GfoRvflTuner:
     >>> ]
 
     >>> opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-    >>> model = GfoRvflTuner(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
-    >>>                   optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True, seed=42)
+    >>> model = GfoRvflCV(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
+    >>>                   optim="OriginalWOA", optim_params=opt_paras, verbose=True, seed=42)
     >>> model.fit(data.X_train, data.y_train)
     >>> print(model.best_params)
     >>> print(model.best_estimator)
@@ -160,8 +166,8 @@ class GfoRvflTuner:
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
     SUPPORTED_REG_METRICS = get_all_regression_metrics()
 
-    def __init__(self, problem_type="regression", bounds=None, cv=5, scoring="MSE",
-                 optimizer="OriginalWOA", optimizer_paras=None, verbose=True, seed=None):
+    def __init__(self, problem_type="regression", bounds=None, cv=None, scoring="MSE",
+                 optim="OriginalWOA", optim_params=None, verbose=True, seed=None, **kwargs):
         if problem_type == "regression":
             self.network_class = RvflRegressor
             self.scoring = boundary_controller.check_str("scoring", scoring, self.SUPPORTED_REG_METRICS)
@@ -175,36 +181,53 @@ class GfoRvflTuner:
         self.seed = seed
         self.problem_type = problem_type
         self.bounds = bounds
+        if bounds is None:
+            self.bounds = [
+                IntegerVar(lb=3, ub=50, name="size_hidden"),
+                StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu",
+                                      "selu", "rrelu", "tanh", "hard_tanh", "sigmoid", "hard_sigmoid",
+                                      "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
+                                      "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink",
+                                      "softmin", "softmax", "log_softmax"), name="act_name"),
+                StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform",
+                                      "glorot_normal", "lecun_uniform", "lecun_normal", "random_uniform",
+                                      "random_normal"), name="weight_initializer"),
+                FloatVar(lb=0, ub=10., name="reg_alpha"),
+            ]
         self.cv = cv
         self.verbose = "console" if verbose else "None"
-        self.optimizer_paras = optimizer_paras
-        self.optimizer = self._set_optimizer(optimizer, optimizer_paras)
+        self.optim_params = optim_params
+        self.optim = self._set_optimizer(optim, optim_params)
         self.best_params = None
         self.best_estimator = None
         self.loss_train = None
+        self.kwargs = kwargs
 
-    def _set_optimizer(self, optimizer=None, optimizer_paras=None):
-        if type(optimizer) is str:
-            opt_class = get_optimizer_by_name(optimizer)
-            if type(optimizer_paras) is dict:
-                return opt_class(**optimizer_paras)
+    def _set_optimizer(self, optim=None, optim_params=None):
+        if type(optim) is str:
+            opt_class = get_optimizer_by_name(optim)
+            if type(optim_params) is dict:
+                return opt_class(**optim_params)
             else:
                 return opt_class(epoch=250, pop_size=20)
-        elif isinstance(optimizer, Optimizer):
-            if type(optimizer_paras) is dict:
-                return optimizer.set_parameters(optimizer_paras)
-            return optimizer
+        elif isinstance(optim, Optimizer):
+            if type(optim_params) is dict:
+                if "name" in optim_params:  # Check if key exists and remove it
+                    optim.name = optim_params.pop("name")
+                optim.set_parameters(optim_params)
+            return optim
         else:
-            raise TypeError(f"optimizer needs to set as a string and supported by Mealpy library.")
+            raise TypeError(f"`optim` parameter needs to set as a string and supported by Mealpy library.")
 
     def fit(self, X, y):
         self.problem = HyperparameterProblem(self.bounds, self.minmax, X, y, self.network_class, self.metric_class,
-                                             obj_name=self.scoring, cv=self.cv, log_to=self.verbose, seed=self.seed)
-        self.optimizer.solve(self.problem, seed=self.seed)
-        self.best_params = self.optimizer.problem.decode_solution(self.optimizer.g_best.solution)
+                                             obj_name=self.scoring, cv=self.cv, seed=self.seed,
+                                             log_to=self.verbose, **self.kwargs)
+        self.optim.solve(self.problem, seed=self.seed)
+        self.best_params = self.optim.problem.decode_solution(self.optim.g_best.solution)
         self.best_estimator = self.network_class(**self.best_params, seed=self.seed)
         self.best_estimator.fit(X, y)
-        self.loss_train = self.optimizer.history.list_global_best_fit
+        self.loss_train = self.optim.history.list_global_best_fit
         return self
 
     def predict(self, X):

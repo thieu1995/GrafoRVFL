@@ -37,13 +37,8 @@ class BaseRVFL(BaseEstimator):
         "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"]
         For definition of these methods, please check it at: https://keras.io/api/layers/initializers/
 
-    trainer : str, default = "MPI"
-        The utilized method for training weights of hidden-output layer and weights of input-output layer.
-            + MPI: Moore-Penrose inversion (Ordinary Least Squares without regularization)
-            + L2: Ordinary Least Squares (OLS) regression with regularization
-
-    alpha : float (Optional), default=0.5
-        Regularization parameter for L2 training. Effective only when `trainer="L2"`.
+    reg_alpha : float (Optional), default=None
+        Regularization parameter for L2 training. Effective only when `reg_alpha` > 0.
 
     seed: int, default=None
         Determines random number generation for weights and bias initialization.
@@ -75,14 +70,13 @@ class BaseRVFL(BaseEstimator):
                             "hard_swish", "soft_plus", "mish", "soft_sign", "tanh_shrink", "soft_shrink",
                             "hard_shrink", "softmin", "softmax", "log_softmax"]
 
-    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="MPI", alpha=0.5, seed=None):
+    def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", reg_alpha=None, seed=None):
         self.size_hidden = size_hidden
         self.act_name = act_name
         self.act_func = getattr(activator, self.act_name)
         self.seed = seed
         self.weight_initializer, self.weight_randomer = self._get_weight_initializer(weight_initializer)
-        self.trainer = trainer
-        self.alpha = alpha
+        self.reg_alpha = reg_alpha
         self.weights = {}
         self.obj_scaler, self.loss_train = None, None
         self.n_labels, self.obj_scaler = None, None
@@ -94,13 +88,6 @@ class BaseRVFL(BaseEstimator):
             return wi, wr
         else:
             raise ValueError(f"weight_initializer should be a string and belongs to {self.SUPPORTED_WEIGHT_INITIALIZER}")
-
-    def _trained(self, trainer="MPI", D=None, y=None):
-        if trainer == "MPI":        # Standard OLS (alpha = 0)
-            return np.linalg.pinv(D) @ y
-        else:   # trainer == "L2":
-            ridge_model = Ridge(alpha=self.alpha, fit_intercept=False, random_state=self.seed)
-            return ridge_model.fit(D, y).coef_.T
 
     def fit(self, X, y):
         """
@@ -134,7 +121,11 @@ class BaseRVFL(BaseEstimator):
         self.weights["bh"] = self.weight_randomer(self.size_hidden, seed=self.seed).flatten()
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
-        self.weights["Wioho"] = self._trained(self.trainer, D, y)
+        if self.reg_alpha is None or self.reg_alpha == 0:         # Standard OLS (reg_alpha = 0)
+            self.weights["Wioho"] = np.linalg.pinv(D) @ y
+        else:                           # trainer == "L2":
+            ridge_model = Ridge(alpha=self.reg_alpha, fit_intercept=False, random_state=self.seed)
+            self.weights["Wioho"] = ridge_model.fit(D, y).coef_.T
         return self
 
     def predict(self, X):
