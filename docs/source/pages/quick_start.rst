@@ -48,7 +48,7 @@ Classes that hold Models and Dataset
 
 	from graforvfl import DataTransformer, Data
 	from graforvfl import RvflRegressor, RvflClassifier
-	from graforvfl import GfoRvflTuner
+	from graforvfl import GfoRvflCV
 
 
 `DataTransformer` class
@@ -108,14 +108,14 @@ We provide many scaler classes that you can select and make a combination of tra
 
 .. code-block:: python
 
-	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflTuner
+	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflCV
 	from mealpy import IntegerVar, StringVar
 
 	## 1. Use standard RVFL model for regression problem
-	model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="OLS", alpha=0.5)
+	model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", alpha=0.5)
 
 	## 2. Use standard RVFL model for classification problem
-	model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="OLS", alpha=0.5)
+	model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", alpha=0)
 
 
 	## 3. Use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL network for regression problem
@@ -124,12 +124,13 @@ We provide many scaler classes that you can select and make a combination of tra
 	    IntegerVar(lb=2, ub=1000, name="size_hidden"),
 	    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu",
 	                          "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
-	    StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
-	                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
+	    StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform",
+	                           "glorot_normal", "lecun_uniform", "lecun_normal", "random_uniform",
+	                           "random_normal"), name="weight_initializer")
 	]
 	opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-	model = GfoRvflTuner(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
-	                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True)
+	model = GfoRvflCV(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
+	                      optim="OriginalWOA", optim_params=opt_paras, verbose=True)
 
 
 Supported functions in `model` object
@@ -141,7 +142,7 @@ Supported functions in `model` object
 
 	data = Data()       # Assumption that you have provided this object like above
 
-	model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="OLS", alpha=0.5)
+	model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", alpha=0.5)
 
 	## Train the model
 	model.fit(data.X_train, data.y_train)

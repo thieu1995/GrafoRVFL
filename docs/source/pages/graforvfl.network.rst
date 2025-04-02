@@ -9,10 +9,10 @@ graforvfl.network.base\_rvfl module
    :undoc-members:
    :show-inheritance:
 
-graforvfl.network.gfo\_rvfl\_tuner module
------------------------------------------
+graforvfl.network.gfo\_rvfl\_cv module
+--------------------------------------
 
-.. automodule:: graforvfl.network.gfo_rvfl_tuner
+.. automodule:: graforvfl.network.gfo_rvfl_cv
    :members:
    :undoc-members:
    :show-inheritance:
