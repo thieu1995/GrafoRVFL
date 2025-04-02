@@ -26,9 +26,9 @@ def test_GfoRvflCV_class():
         FloatVar(lb=0.0, ub=1.0, name="reg_alpha")
     ]
 
-    model = GfoRvflCV(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
+    model = GfoRvflCV(problem_type="regression", bounds=my_bounds,
                       optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 5, "pop_size": 10},
-                      seed=42, verbose=True)
+                      scoring="MSE", cv=3, seed=42, verbose=True)
     model.fit(X, y)
     print(model.best_params)
     print(model.best_estimator)

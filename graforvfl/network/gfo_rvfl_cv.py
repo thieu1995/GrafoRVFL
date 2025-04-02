@@ -155,8 +155,9 @@ class GfoRvflCV:
     >>> ]
 
     >>> opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-    >>> model = GfoRvflCV(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
-    >>>                   optim="OriginalWOA", optim_params=opt_paras, verbose=True, seed=42)
+    >>> model = GfoRvflCV(problem_type="classification", bounds=my_bounds,
+    >>>                   optim="OriginalWOA", optim_params=opt_paras,
+    >>>                   scoring="AS", cv=3, seed=42, verbose=True)
     >>> model.fit(data.X_train, data.y_train)
     >>> print(model.best_params)
     >>> print(model.best_estimator)
@@ -166,8 +167,9 @@ class GfoRvflCV:
     SUPPORTED_CLS_METRICS = get_all_classification_metrics()
     SUPPORTED_REG_METRICS = get_all_regression_metrics()
 
-    def __init__(self, problem_type="regression", bounds=None, cv=None, scoring="MSE",
-                 optim="OriginalWOA", optim_params=None, verbose=True, seed=None, **kwargs):
+    def __init__(self, problem_type="regression", bounds=None,
+                 optim="OriginalWOA", optim_params=None,
+                 scoring="MSE", cv=None, seed=None, verbose=True,  **kwargs):
         if problem_type == "regression":
             self.network_class = RvflRegressor
             self.scoring = boundary_controller.check_str("scoring", scoring, self.SUPPORTED_REG_METRICS)

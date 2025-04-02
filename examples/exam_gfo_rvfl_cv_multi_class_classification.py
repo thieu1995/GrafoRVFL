@@ -33,9 +33,9 @@ my_bounds = [
     FloatVar(lb=0, ub=10., name="reg_alpha"),
 ]
 
-model = GfoRvflCV(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
-                      optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 10, "pop_size": 20},
-                     verbose=True, seed=42)
+model = GfoRvflCV(problem_type="classification", bounds=my_bounds,
+                  optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 10, "pop_size": 20},
+                  scoring="AS", cv=3, seed=42, verbose=True)
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)

@@ -129,8 +129,9 @@ We provide many scaler classes that you can select and make a combination of tra
 	                           "random_normal"), name="weight_initializer")
 	]
 	opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-	model = GfoRvflCV(problem_type="regression", bounds=my_bounds, cv=3, scoring="MSE",
-	                      optim="OriginalWOA", optim_params=opt_paras, verbose=True)
+	model = GfoRvflCV(problem_type="regression", bounds=my_bounds,
+	                    optim="OriginalWOA", optim_params=opt_paras,
+	                    scoring="MSE", cv=3, seed=42, verbose=True)
 
 
 Supported functions in `model` object
