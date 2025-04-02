@@ -6,6 +6,7 @@
 
 __version__ = "1.2.0"
 
+from mealpy import StringVar, IntegerVar, FloatVar
 from graforvfl.shared.data_processor import DataTransformer, Data
 from graforvfl.network.standard_rvfl import RvflRegressor, RvflClassifier
-from graforvfl.network.gfo_rvfl_tuner import GfoRvflTuner
+from graforvfl.network.gfo_rvfl_cv import GfoRvflCV
