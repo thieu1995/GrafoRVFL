@@ -24,7 +24,7 @@ data.y_train, scaler_y = data.scale(data.y_train, scaling_methods=("standard", "
 data.y_test = scaler_y.transform(data.y_test.reshape(-1, 1))
 
 ## Create network
-model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", trainer="L2", alpha=0.5, seed=42)
+model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", reg_alpha=0.5, seed=42)
 
 ## Train the network
 model.fit(data.X_train, data.y_train)

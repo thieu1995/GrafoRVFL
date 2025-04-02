@@ -24,7 +24,7 @@ data.y_train, scaler_y = data.encode_label(data.y_train)
 data.y_test = scaler_y.transform(data.y_test)
 
 ## Create network
-model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", trainer="L2", alpha=0.5, seed=42)
+model = RvflClassifier(size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", reg_alpha=0.5, seed=42)
 
 ## Train the network
 model.fit(X=data.X_train, y=data.y_train)

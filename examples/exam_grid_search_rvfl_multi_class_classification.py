@@ -8,6 +8,7 @@ from sklearn.datasets import load_iris
 from graforvfl import RvflClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 
+
 # Step 1: Load the Iris dataset
 data = load_iris()
 X, y = data.data, data.target
@@ -21,14 +22,15 @@ param_grid = {
     'act_name': ["none", "relu", "leaky_relu", "celu", "prelu", "gelu",
                           "elu", "selu", "rrelu", "tanh", "sigmoid"],
     'weight_initializer': ["orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
-                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"]
+                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"],
+    'reg_alpha': [0, 0.1, 0.2, 0.3]
 }
 
 # Step 4: Create the model
 model = RvflClassifier(seed=42)
 
 # Step 5: Perform grid search
-grid_search = GridSearchCV(model, param_grid, scoring='accuracy')
+grid_search = GridSearchCV(model, param_grid, scoring='accuracy', verbose=1)
 grid_search.fit(X_train, y_train)
 
 # Step 6: Evaluate results
