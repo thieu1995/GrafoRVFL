@@ -4,7 +4,9 @@
 #       Github: https://github.com/thieu1995        %                         
 # --------------------------------------------------%
 
+import inspect
 import pickle
+import pprint
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -205,6 +207,26 @@ class GfoRvflCV:
         self.loss_train = None
         self.kwargs = kwargs
 
+    # def __repr__(self, **kwargs):
+    #     """Return a string representation of the object similar to scikit-learn estimators.
+    #     """
+    #     param_order = list(inspect.signature(self.__init__).parameters.keys())  # Lấy danh sách tham số theo thứ tự
+    #     param_str = ", ".join(f"{k}={repr(getattr(self, k))}" for k in param_order)  # Tạo chuỗi in
+    #     return f"{self.__class__.__name__}({param_str})"
+
+    def __repr__(self, **kwargs):
+        """Pretty-print parameters like scikit-learn's Estimator.
+        """
+        param_order = list(inspect.signature(self.__init__).parameters.keys())
+        param_dict = {k: getattr(self, k) for k in param_order}
+
+        param_str = ", ".join(f"{k}={repr(v)}" for k, v in param_dict.items())
+        if len(param_str) <= 80:
+            return f"{self.__class__.__name__}({param_str})"
+        else:
+            formatted_params = ",\n  ".join(f"{k}={pprint.pformat(v)}" for k, v in param_dict.items())
+            return f"{self.__class__.__name__}(\n  {formatted_params}\n)"
+
     def _set_optimizer(self, optim=None, optim_params=None):
         if type(optim) is str:
             opt_class = get_optimizer_by_name(optim)
@@ -236,6 +258,19 @@ class GfoRvflCV:
         if self.best_params is None or self.best_estimator is None:
             raise ValueError(f"Model is not trained, please call the fit() function.")
         return self.best_estimator.predict(X)
+
+    def score(self, X, y):
+        if self.best_params is None or self.best_estimator is None:
+            raise ValueError(f"Model is not trained, please call the fit() function.")
+        return self.best_estimator.score(X, y)
+
+    def scores(self, X, y, list_metrics=("AS", "RS")):
+        if self.best_params is None or self.best_estimator is None:
+            raise ValueError(f"Model is not trained, please call the fit() function.")
+        return self.best_estimator.scores(X, y, list_metrics)
+
+    def evaluate(self, y_true, y_pred, list_metrics=("AS", "RS")):
+        return self.best_estimator.evaluate(y_true, y_pred, list_metrics)
 
     def save_convergence(self, save_path="history", filename="convergence.csv"):
         """

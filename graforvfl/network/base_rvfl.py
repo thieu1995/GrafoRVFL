@@ -4,6 +4,8 @@
 #       Github: https://github.com/thieu1995        %                         
 # --------------------------------------------------%
 
+import inspect
+import pprint
 import pickle
 import numpy as np
 import pandas as pd
@@ -80,6 +82,26 @@ class BaseRVFL(BaseEstimator):
         self.weights = {}
         self.obj_scaler, self.loss_train = None, None
         self.n_labels, self.obj_scaler = None, None
+
+    # def __repr__(self, **kwargs):
+    #     """Return a string representation of the object similar to scikit-learn estimators.
+    #     """
+    #     param_order = list(inspect.signature(self.__init__).parameters.keys())  # Lấy danh sách tham số theo thứ tự
+    #     param_str = ", ".join(f"{k}={repr(getattr(self, k))}" for k in param_order)  # Tạo chuỗi in
+    #     return f"{self.__class__.__name__}({param_str})"
+
+    def __repr__(self, **kwargs):
+        """Pretty-print parameters like scikit-learn's Estimator.
+        """
+        param_order = list(inspect.signature(self.__init__).parameters.keys())
+        param_dict = {k: getattr(self, k) for k in param_order}
+
+        param_str = ", ".join(f"{k}={repr(v)}" for k, v in param_dict.items())
+        if len(param_str) <= 80:
+            return f"{self.__class__.__name__}({param_str})"
+        else:
+            formatted_params = ",\n  ".join(f"{k}={pprint.pformat(v)}" for k, v in param_dict.items())
+            return f"{self.__class__.__name__}(\n  {formatted_params}\n)"
 
     def _get_weight_initializer(self, name):
         if type(name) is str:
