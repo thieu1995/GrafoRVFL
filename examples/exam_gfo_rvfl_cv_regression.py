@@ -39,4 +39,4 @@ model = GfoRvflCV(problem_type="regression", bounds=my_bounds,
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
-print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("MSE", "RMSE", "MAPE", "NSE", "R2", "KGE")))
+print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("MSE", "RMSE", "MAPE", "NSE", "R", "KGE")))
