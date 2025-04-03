@@ -18,11 +18,33 @@ class GfoRvflTuner:
 
     Parameters
     ----------
-    base_model : GfoRvflCV instance
-        A base instance of GfoRvflCV with fixed RVFL hyperparameters.
+
+    problem_type : str, default="regression"
+        The type of problem you are trying to solve (regression or classification)
+
+    bounds : list, default=None
+        The boundary for parameters of RVFL network.
+
+        cv : int, default=None
+        The k fold cross-validation method.
+
+    scoring : str
+        The name of objective for the problem, also depend on the problem is classification and regression.
+
+    optim : str or instance of Optimizer class (from Mealpy library), default = "BaseGA"
+        The Metaheuristic Algorithm that use to solve the feature selection problem.
+        Current supported list, please check it here: https://github.com/thieu1995/mealpy.
+        If a custom optimizer is passed, make sure it is an instance of `Optimizer` class.
 
     optim_param_grid : dict
         Dictionary of hyperparameter ranges for the metaheuristic algorithm.
+        If `dict` is passed, make sure it has at least `epoch` and `pop_size` parameters.
+
+    scoring : str, default="MSE"
+        The evaluation metric used to compare different optimization settings.
+
+    cv : int, default=None
+        Number of cross-validation folds.
 
     search_type : str, default="random"
         - "grid" for exhaustive grid search.
@@ -31,17 +53,12 @@ class GfoRvflTuner:
     n_iter : int, default=10
         Number of random search iterations (only used when search_type="random").
 
-    cv : int, default=3
-        Number of cross-validation folds.
+    seed: int, default=None
+        Determines random number generation for weights and bias initialization.
+        Pass an int for reproducible results across multiple function calls.
 
-    scoring : str, default="accuracy"
-        The evaluation metric used to compare different optimization settings.
-
-    random_state : int, default=None
-        Random seed for reproducibility.
-
-    verbose : bool, default=True
-        Whether to print progress.
+    verbose : bool, default=False
+        Whether to print progress messages to stdout.
 
     Attributes
     ----------
@@ -77,6 +94,7 @@ class GfoRvflTuner:
 
         self.best_optim_params = None
         self.best_searcher = None
+        self.kwargs = kwargs
 
         if problem_type == "regression":
             self.minmax = self.SUPPORTED_REG_METRICS[scoring]
@@ -115,7 +133,8 @@ class GfoRvflTuner:
             # Clone base model and update optimization parameters
             model = GfoRvflCV(problem_type=self.problem_type, bounds=self.bounds,
                               optim=self.optim, optim_params=optim_params,
-                              scoring=self.scoring, cv=self.cv, seed=self.seed, verbose=self.verbose)
+                              scoring=self.scoring, cv=self.cv,
+                              seed=self.seed, verbose=self.verbose, **self.kwargs)
 
             # Perform cross-validation
             scores = []
