@@ -27,7 +27,7 @@ with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tu
 
 * **Free software:** GNU General Public License (GPL) V3 license
 * **Documentation:** https://graforvfl.readthedocs.io
-* **Provided Estimator**: `RvflRegressor`, `RvflClassifier`, `GfoRvflTuner`
+* **Provided Estimator**: `RvflRegressor`, `RvflClassifier`, `GfoRvflCV`, `GfoRvflTuner`, `GfoRvflComparator`
 * **Python versions:** >= 3.8.x
 * **Dependencies:** numpy, scipy, scikit-learn, pandas, mealpy, permetrics
 
@@ -101,14 +101,14 @@ $ python
 
 # Example
 
-Below is the example code of how to use Gradient Free Optimization to tune hyper-parameter of RVFL network.
+Below is a simple example code of how to use Gradient Free Optimization to tune hyper-parameter of RVFL network.
 The more complicated cases in the folder: [examples](/examples). You can also read the [documentation](https://graforvfl.readthedocs.io/) 
 for more detailed installation instructions, explanations, and examples.
 
 ```python
 from sklearn.datasets import load_breast_cancer
-from mealpy import StringVar, IntegerVar
-from graforvfl import Data, GfoRvflTuner
+from graforvfl import Data, GfoRvflCV, StringVar, IntegerVar, FloatVar
+
 
 ## Load data object
 X, y = load_breast_cancer(return_X_y=True)
@@ -127,16 +127,21 @@ data.y_test = scaler_y.transform(data.y_test)
 
 # Design the boundary (parameters)
 my_bounds = [
-    IntegerVar(lb=2, ub=1000, name="size_hidden"),
-    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu",
-                          "elu", "selu", "rrelu", "tanh", "sigmoid"), name="act_name"),
-    StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform", "glorot_normal",
-                          "lecun_uniform", "lecun_normal", "random_uniform", "random_normal"), name="weight_initializer")
+    IntegerVar(lb=3, ub=50, name="size_hidden"),
+    StringVar(valid_sets=("none", "relu", "leaky_relu", "celu", "prelu", "gelu", "elu",
+                          "selu", "rrelu", "tanh", "hard_tanh", "sigmoid", "hard_sigmoid",
+                          "log_sigmoid", "silu", "swish", "hard_swish", "soft_plus", "mish",
+                          "soft_sign", "tanh_shrink", "soft_shrink", "hard_shrink",
+                          "softmin", "softmax", "log_softmax"), name="act_name"),
+    StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform",
+                          "glorot_normal", "lecun_uniform", "lecun_normal", "random_uniform",
+                          "random_normal"), name="weight_initializer"),
+    FloatVar(lb=0, ub=10., name="reg_alpha"),
 ]
 
-opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
-model = GfoRvflTuner(problem_type="classification", bounds=my_bounds, cv=3, scoring="AS",
-                      optimizer="OriginalWOA", optimizer_paras=opt_paras, verbose=True, seed=42)
+model = GfoRvflCV(problem_type="classification", bounds=my_bounds,
+                  optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 10, "pop_size": 20},
+                  scoring="AS", cv=3, seed=42, verbose=True)
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
