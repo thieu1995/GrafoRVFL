@@ -3,7 +3,7 @@
 
 ---
 
-[![GitHub release](https://img.shields.io/badge/release-1.2.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
+[![GitHub release](https://img.shields.io/badge/release-2.0.0-yellow.svg)](https://github.com/thieu1995/GrafoRVFL/releases)
 [![Wheel](https://img.shields.io/pypi/wheel/gensim.svg)](https://pypi.python.org/pypi/graforvfl) 
 [![PyPI version](https://badge.fury.io/py/graforvfl.svg)](https://badge.fury.io/py/graforvfl)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/graforvfl.svg)

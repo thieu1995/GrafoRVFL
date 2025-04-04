@@ -4,7 +4,7 @@
 #       Github: https://github.com/thieu1995        %                         
 # --------------------------------------------------%
 
-__version__ = "1.2.0"
+__version__ = "2.0.0"
 
 from mealpy import StringVar, IntegerVar, FloatVar
 from graforvfl.shared.data_processor import DataTransformer, Data

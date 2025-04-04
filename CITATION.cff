@@ -5,7 +5,7 @@ authors:
     given-names: "Nguyen"
     orcid: "https://orcid.org/0000-0001-9994-8747"
 title: "GrafoRVFL: A Gradient-Free Optimization Framework for Boosting Random Vector Functional Link Network"
-version: v1.2.0
+version: v2.0.0
 doi: 10.5281/zenodo.10258280
 date-released: 2023-12-05
 url: "https://github.com/thieu1995/GrafoRVFL"
