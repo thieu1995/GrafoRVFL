@@ -11,3 +11,4 @@ from graforvfl.shared.data_processor import DataTransformer, Data
 from graforvfl.network.standard_rvfl import RvflRegressor, RvflClassifier
 from graforvfl.network.gfo_rvfl_cv import GfoRvflCV
 from graforvfl.network.gfo_rvfl_tuner import GfoRvflTuner
+from graforvfl.network.gfo_rvfl_comparator import GfoRvflComparator
