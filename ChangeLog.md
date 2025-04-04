@@ -1,3 +1,13 @@
+# Version 2.0.0
+
++ Fix bugs check digit, floating, number, sequence in `boundary_controller` module.
++ Remove `trainer` parameter from RVFL-based models
++ Rename `GfoRvflTuner` class to `GfoRvflCV` class
++ Add `GfoRvflTuner` class that can be used to tune optimizer-parameter of GFO-RVFL network
++ Add `GfoRvflComparator` class that can be used to compare the performance of multiple GFO-RVFL networks
++ Update examples, tests, and documentation.
+
+------------------------------------------------------------------------------
 
 # Version 1.2.0
 
