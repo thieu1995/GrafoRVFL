@@ -9,10 +9,26 @@ graforvfl.network.base\_rvfl module
    :undoc-members:
    :show-inheritance:
 
+graforvfl.network.gfo\_rvfl\_comparator module
+----------------------------------------------
+
+.. automodule:: graforvfl.network.gfo_rvfl_comparator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 graforvfl.network.gfo\_rvfl\_cv module
 --------------------------------------
 
 .. automodule:: graforvfl.network.gfo_rvfl_cv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graforvfl.network.gfo\_rvfl\_tuner module
+-----------------------------------------
+
+.. automodule:: graforvfl.network.gfo_rvfl_tuner
    :members:
    :undoc-members:
    :show-inheritance:

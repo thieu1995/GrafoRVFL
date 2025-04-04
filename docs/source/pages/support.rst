@@ -49,7 +49,6 @@ Please include these citations if you plan to use this library::
 	  doi={10.1109/SOCA.2018.00014}
 	}
 
-```
 
 If you have an open-ended or a research question, you can contact me via nguyenthieu2102@gmail.com.
 

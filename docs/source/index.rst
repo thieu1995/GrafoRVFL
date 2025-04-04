@@ -52,14 +52,14 @@ Welcome to GrafoRVFL's documentation!
    :target: https://www.gnu.org/licenses/gpl-3.0
 
 
-GrafoRVFL is an open-source library in Python that employs gradient-free optimization ((GA, PSO, WOA, TLO, DE, ...) to
+GrafoRVFL is an open-source library in Python that employs gradient-free optimization (GA, PSO, WOA, TLO, DE, ...) to
 optimize Random Vector Functional Link Networks. It is entirely implemented based on Numpy and fully compatible
 with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tune the hyper-parameters of network
 or optimize weights in the network using gradient-free optimizers.
 
 
 * **Free software:** GNU General Public License (GPL) V3 license
-* **Provided Estimator**: RvflRegressor, RvflClassifier, GfoRvflCV
+* **Provided Estimator**: `RvflRegressor`, `RvflClassifier`, `GfoRvflCV`, `GfoRvflTuner`, `GfoRvflComparator`
 * **Total Gradient Free based RVFL Regressor**: > 200 Models
 * **Total Gradient Free based RVFL Classifier**: > 200 Models
 * **Supported performance metrics**: >= 67 (47 regressions and 20 classifications)

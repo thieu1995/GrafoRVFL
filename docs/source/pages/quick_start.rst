@@ -55,7 +55,9 @@ Classes that hold Models and Dataset
 -----------------------
 
 We provide many scaler classes that you can select and make a combination of transforming your data via
-`DataTransformer` class. For example: scale data by `Loge` and then `Sqrt` and then `MinMax`::
+`DataTransformer` class. For example: scale data by `Loge` and then `Sqrt` and then `MinMax`.
+
+.. code-block:: python
 
 	from graforvfl import DataTransformer
 	import pandas as pd
@@ -108,8 +110,7 @@ We provide many scaler classes that you can select and make a combination of tra
 
 .. code-block:: python
 
-	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflCV
-	from mealpy import IntegerVar, StringVar
+	from graforvfl import RvflRegressor, RvflClassifier, GfoRvflCV, IntegerVar, StringVar
 
 	## 1. Use standard RVFL model for regression problem
 	model = RvflRegressor(size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", alpha=0.5)
@@ -130,8 +131,8 @@ We provide many scaler classes that you can select and make a combination of tra
 	]
 	opt_paras = {"name": "WOA", "epoch": 10, "pop_size": 20}
 	model = GfoRvflCV(problem_type="regression", bounds=my_bounds,
-	                    optim="OriginalWOA", optim_params=opt_paras,
-	                    scoring="MSE", cv=3, seed=42, verbose=True)
+	                optim="OriginalWOA", optim_params=opt_paras,
+	                scoring="MSE", cv=3, seed=42, verbose=True)
 
 
 Supported functions in `model` object
