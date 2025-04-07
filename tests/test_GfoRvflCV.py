@@ -7,7 +7,7 @@
 import pytest
 import numpy as np
 from sklearn.datasets import load_breast_cancer, make_regression
-from graforvfl import GfoRvflCV, Data, IntegerVar, StringVar, FloatVar
+from graforvfl import GfoRvflCV, Data, IntegerVar, StringVar
 
 
 @pytest.fixture
