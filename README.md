@@ -29,7 +29,7 @@ with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tu
 * **Documentation:** https://graforvfl.readthedocs.io
 * **Provided Estimator**: `RvflRegressor`, `RvflClassifier`, `GfoRvflCV`, `GfoRvflTuner`, `GfoRvflComparator`
 * **Python versions:** >= 3.8.x
-* **Dependencies:** numpy, scipy, scikit-learn, pandas, mealpy, permetrics
+* **Dependencies:** numpy, scipy, scikit-learn, pandas, mealpy, permetrics, matplotlib
 
 
 # Citation Request 

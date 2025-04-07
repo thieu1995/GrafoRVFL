@@ -66,7 +66,7 @@ or optimize weights in the network using gradient-free optimizers.
 * **Supported objective functions (as fitness functions or loss functions)**: >= 67 (47 regressions and 20 classifications)
 * **Documentation:** https://graforvfl.readthedocs.io
 * **Python versions:** >= 3.8.x
-* **Dependencies:** numpy, scipy, scikit-learn, pandas, mealpy, permetrics
+* **Dependencies:** numpy, scipy, scikit-learn, pandas, mealpy, permetrics, matplotlib
 
 
 .. toctree::
