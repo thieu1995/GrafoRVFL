@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import KFold
-from mealpy import Problem, get_optimizer_by_name, Optimizer, IntegerVar, StringVar, FloatVar
+from mealpy import Problem, get_optimizer_by_class, Optimizer, IntegerVar, StringVar, FloatVar
 from permetrics import ClassificationMetric, RegressionMetric
 from graforvfl.shared.scorer import get_all_classification_metrics, get_all_regression_metrics
 from graforvfl.shared import boundary_controller
@@ -171,7 +171,8 @@ class GfoRvflCV:
 
     def __init__(self, problem_type="regression", bounds=None,
                  optim="OriginalWOA", optim_params=None,
-                 scoring="MSE", cv=None, seed=None, verbose=True,  **kwargs):
+                 scoring="MSE", cv=None, seed=None, verbose=True,
+                 mode='single', n_workers=None, termination=None, **kwargs):
         if problem_type == "regression":
             self.network_class = RvflRegressor
             self.scoring = boundary_controller.check_str("scoring", scoring, self.SUPPORTED_REG_METRICS)
@@ -196,23 +197,19 @@ class GfoRvflCV:
                 StringVar(valid_sets=("orthogonal", "he_uniform", "he_normal", "glorot_uniform",
                                       "glorot_normal", "lecun_uniform", "lecun_normal", "random_uniform",
                                       "random_normal"), name="weight_initializer"),
-                FloatVar(lb=0, ub=10., name="reg_alpha"),
+                FloatVar(lb=0., ub=10., name="reg_alpha"),
             ]
         self.cv = cv
-        self.verbose = "console" if verbose else "None"
+        self.verbose = verbose
         self.optim_params = optim_params
-        self.optim = self._set_optimizer(optim, optim_params)
+        self.optim = optim
+        self.mode = mode
+        self.n_workers = n_workers
+        self.termination = termination
+        self.kwargs = kwargs
         self.best_params = None
         self.best_estimator = None
         self.loss_train = None
-        self.kwargs = kwargs
-
-    # def __repr__(self, **kwargs):
-    #     """Return a string representation of the object similar to scikit-learn estimators.
-    #     """
-    #     param_order = list(inspect.signature(self.__init__).parameters.keys())  # Lấy danh sách tham số theo thứ tự
-    #     param_str = ", ".join(f"{k}={repr(getattr(self, k))}" for k in param_order)  # Tạo chuỗi in
-    #     return f"{self.__class__.__name__}({param_str})"
 
     def __repr__(self, **kwargs):
         """Pretty-print parameters like scikit-learn's Estimator.
@@ -228,26 +225,28 @@ class GfoRvflCV:
             return f"{self.__class__.__name__}(\n  {formatted_params}\n)"
 
     def _set_optimizer(self, optim=None, optim_params=None):
-        if type(optim) is str:
-            opt_class = get_optimizer_by_name(optim)
-            if type(optim_params) is dict:
+        if isinstance(optim, str):
+            opt_class = get_optimizer_by_class(optim)
+            if isinstance(optim_params, dict):
                 return opt_class(**optim_params)
             else:
                 return opt_class(epoch=250, pop_size=20)
         elif isinstance(optim, Optimizer):
-            if type(optim_params) is dict:
+            if isinstance(optim_params, dict):
                 if "name" in optim_params:  # Check if key exists and remove it
                     optim.name = optim_params.pop("name")
                 optim.set_parameters(optim_params)
             return optim
         else:
-            raise TypeError(f"`optim` parameter needs to set as a string and supported by Mealpy library.")
+            raise TypeError(f"`optim` needs to set as a string and supported by Mealpy library.")
 
     def fit(self, X, y):
+        log_to = "console" if self.verbose else "None"
+        self.optim_params = self.optim_params or {}
+        self.optim = self._set_optimizer(self.optim, self.optim_params)
         self.problem = HyperparameterProblem(self.bounds, self.minmax, X, y, self.network_class, self.metric_class,
-                                             obj_name=self.scoring, cv=self.cv, seed=self.seed,
-                                             log_to=self.verbose, **self.kwargs)
-        self.optim.solve(self.problem, seed=self.seed)
+                                             obj_name=self.scoring, cv=self.cv, seed=self.seed, log_to=log_to, **self.kwargs)
+        self.optim.solve(self.problem, seed=self.seed, mode=self.mode, termination=self.termination, n_workers=self.n_workers)
         self.best_params = self.optim.problem.decode_solution(self.optim.g_best.solution)
         self.best_estimator = self.network_class(**self.best_params, seed=self.seed)
         self.best_estimator.fit(X, y)

@@ -35,7 +35,8 @@ my_bounds = [
 
 model = GfoRvflCV(problem_type="classification", bounds=my_bounds,
                   optim="OriginalWOA", optim_params={"name": "WOA", "epoch": 10, "pop_size": 20},
-                  scoring="AS", cv=3, seed=42, verbose=True)
+                  scoring="AS", cv=3, seed=42, verbose=True,
+                  mode="single", n_workers=None, termination=None)
 model.fit(data.X_train, data.y_train)
 print(model.best_params)
 print(model.best_estimator)
