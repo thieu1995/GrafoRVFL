@@ -12,37 +12,86 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, MaxAbsScaler, Ro
 
 
 class OneHotEncoder:
+    """
+    A simple implementation of one-hot encoding for 1D categorical data.
+
+    Attributes:
+        categories_ (np.ndarray): Sorted array of unique categories fitted from the input data.
+    """
     def __init__(self):
+        """Initialize the encoder with no categories."""
         self.categories_ = None
 
     def fit(self, X):
-        """Fit the encoder to unique categories in X."""
+        """
+        Fit the encoder to the unique categories in X.
+
+        Args:
+            X (array-like): 1D array of categorical values.
+
+        Returns:
+            self: Fitted OneHotEncoder instance.
+        """
+        X = np.asarray(X).ravel()
         self.categories_ = np.unique(X)
         return self
 
     def transform(self, X):
-        """Transform X into one-hot encoded format."""
+        """
+        Transform input data into one-hot encoded format.
+
+        Args:
+            X (array-like): 1D array of categorical values.
+
+        Returns:
+            np.ndarray: One-hot encoded array of shape (n_samples, n_categories).
+
+        Raises:
+            ValueError: If the encoder has not been fitted or unknown category is found.
+        """
         if self.categories_ is None:
             raise ValueError("The encoder has not been fitted yet.")
+
+        X = np.asarray(X).ravel()
         one_hot = np.zeros((X.shape[0], len(self.categories_)), dtype=int)
+
         for i, val in enumerate(X):
-            index = np.where(self.categories_ == val)[0][0]
-            one_hot[i, index] = 1
+            indices = np.where(self.categories_ == val)[0]
+            if len(indices) == 0:
+                raise ValueError(f"Unknown category encountered during transform: {val}")
+            one_hot[i, indices[0]] = 1
         return one_hot
 
     def fit_transform(self, X):
-        """Fit the encoder to X and transform X."""
-        self.fit(X)
-        return self.transform(X)
+        """
+        Fit the encoder to X and transform X.
+
+        Args:
+            X (array-like): 1D array of categorical values.
+
+        Returns:
+            np.ndarray: One-hot encoded array of shape (n_samples, n_categories).
+        """
+        return self.fit(X).transform(X)
 
     def inverse_transform(self, one_hot):
-        """Convert one-hot encoded format back to original categories."""
+        """
+        Convert one-hot encoded data back to original categories.
+
+        Args:
+            one_hot (np.ndarray): 2D array of one-hot encoded data.
+
+        Returns:
+            np.ndarray: 1D array of original categorical values.
+
+        Raises:
+            ValueError: If the encoder has not been fitted or shape mismatch occurs.
+        """
         if self.categories_ is None:
             raise ValueError("The encoder has not been fitted yet.")
         if one_hot.shape[1] != len(self.categories_):
             raise ValueError("The shape of the input does not match the number of categories.")
-        original = np.array([self.categories_[np.argmax(row)] for row in one_hot])
-        return original
+        return np.array([self.categories_[np.argmax(row)] for row in one_hot])
 
 
 class LabelEncoder:
