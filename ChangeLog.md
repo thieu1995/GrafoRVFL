@@ -1,3 +1,20 @@
+# Version 2.1.0
+
++ Update `setup.py` for more robust and maintainable package management.
++ Update `mealpy` dependency to **v3.0.2** for better performance and compatibility.
++ Update GitHub Actions workflows for testing and publishing.
++ Update `scorer` module.
++ Update `OneHotEncoder` and `LabelEncoder` classes.
++ Update `TimeSeriesDifferencer`, `FeatureEngineering`, and `DataTransformer` classes.
+
++ Remove `trainer` parameter from RVFL-based models
++ Rename `GfoRvflTuner` class to `GfoRvflCV` class
++ Add `GfoRvflTuner` class that can be used to tune optimizer-parameter of GFO-RVFL network
++ Add `GfoRvflComparator` class that can be used to compare the performance of multiple GFO-RVFL networks
++ Update examples, tests, and documentation.
+
+------------------------------------------------------------------------------
+
 # Version 2.0.0
 
 + Fix bugs check digit, floating, number, sequence in `boundary_controller` module.
