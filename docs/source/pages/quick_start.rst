@@ -6,7 +6,7 @@ Installation
 
 .. code-block:: bash
 
-	$ pip install graforvfl==2.0.0
+	$ pip install graforvfl==2.1.0
 
 
 * Install directly from source code.
