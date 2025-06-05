@@ -6,11 +6,7 @@
 + Update `scorer` module.
 + Update `OneHotEncoder` and `LabelEncoder` classes.
 + Update `TimeSeriesDifferencer`, `FeatureEngineering`, and `DataTransformer` classes.
-
-+ Remove `trainer` parameter from RVFL-based models
-+ Rename `GfoRvflTuner` class to `GfoRvflCV` class
-+ Add `GfoRvflTuner` class that can be used to tune optimizer-parameter of GFO-RVFL network
-+ Add `GfoRvflComparator` class that can be used to compare the performance of multiple GFO-RVFL networks
++ Add more parameters to `GfoRvflCV`, `GfoRvflTuner`, and `GfoRvflComparator` classes include `mode`, `n_workers`, and `termination`.
 + Update examples, tests, and documentation.
 
 ------------------------------------------------------------------------------
