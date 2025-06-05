@@ -44,8 +44,9 @@ optim_params_list = [
 
 # Khởi tạo comparator
 comparator = GfoRvflComparator(problem_type="classification", bounds=my_bounds,
-                     optim_list=optim_list, optim_params_list=optim_params_list,
-                     scoring="AS", cv=3, seed=42, verbose=True)
+                               optim_list=optim_list, optim_params_list=optim_params_list,
+                               scoring="AS", cv=3, seed=42, verbose=True,
+                               mode='single', n_workers=None, termination=None)
 # Chạy so sánh
 _, _, results = comparator.run(data.X_train, data.y_train, data.X_test, data.y_test, n_trials=3,
                list_metrics=("PS", "RS", "NPV", "F1S", "F2S"),

@@ -26,13 +26,16 @@ class GfoRvflComparator:
         cv (int): Number of cross-validation folds.
         seed (int): Random seed for reproducibility.
         verbose (bool): Verbosity mode.
+        mode (str, Optional): Mode for optimization (default is 'single')
+        n_workers (int, None, Optional): Number of workers for parallel processing in optimizer (default is None).
+        termination (any, None, Optional): Termination criteria for optimizer (default is None).
         kwargs (dict): Additional keyword arguments.
     """
 
     def __init__(self, problem_type="regression", bounds=None,
                  optim_list=None, optim_params_list=None,
-                 scoring="MSE", cv=None,
-                 seed=None, verbose=True, **kwargs):
+                 scoring="MSE", cv=None, seed=None, verbose=True,
+                 mode='single', n_workers=None, termination=None, **kwargs):
         """
         Initializes the GfoRvflComparator with the given parameters.
 
@@ -45,6 +48,9 @@ class GfoRvflComparator:
             cv (int): Number of cross-validation folds.
             seed (int): Random seed for reproducibility.
             verbose (bool): Verbosity mode.
+            mode (str, Optional): Mode for optimization (default is 'single')
+            n_workers (int, None, Optional): Number of workers for parallel processing in optimizer (default is None).
+            termination (any, None, Optional): Termination criteria for optimizer (default is None).
             **kwargs: Additional keyword arguments.
         """
         if len(optim_list) != len(optim_params_list):
@@ -60,6 +66,9 @@ class GfoRvflComparator:
         self.verbose = verbose
         self.kwargs = kwargs
         self.generator = np.random.default_rng(seed)
+        self.mode = mode
+        self.n_workers = n_workers
+        self.termination = termination
         self.optimizer_names = []
 
     def run(self, X_train, y_train, X_test, y_test, n_trials=3,
@@ -106,8 +115,8 @@ class GfoRvflComparator:
                 # Tạo model với optimizer hiện tại
                 model = GfoRvflCV(problem_type=self.problem_type, bounds=self.bounds,
                                   optim=optim, optim_params=params,
-                                  scoring=self.scoring, cv=self.cv,
-                                  seed=seed, verbose=self.verbose, **self.kwargs)
+                                  scoring=self.scoring, cv=self.cv, seed=seed, verbose=self.verbose,
+                                  mode=self.mode, n_workers=self.n_workers, termination=self.termination, **self.kwargs)
                 # Train model
                 model.fit(X_train, y_train)
                 # Ghi lại thời gian chạy
