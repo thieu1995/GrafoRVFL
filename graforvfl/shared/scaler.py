@@ -96,76 +96,105 @@ class OneHotEncoder:
 
 class LabelEncoder:
     """
-    Encode categorical features as integer labels.
+    Encode categorical labels as integer indices and decode them back.
+
+    This class maps unique categorical labels to integers from 0 to n_classes - 1.
     """
 
     def __init__(self):
+        """
+        Initialize the label encoder.
+        """
         self.unique_labels = None
         self.label_to_index = {}
 
     def fit(self, y):
         """
-        Fit label encoder to a given set of labels.
+        Fit the encoder by finding unique labels in the input data.
 
         Parameters
         ----------
         y : array-like
-            Labels to encode.
+            Input labels.
+
+        Returns
+        -------
+        self : LabelEncoder
+            Fitted LabelEncoder instance.
         """
+        y = np.asarray(y).ravel()
         self.unique_labels = np.unique(y)
         self.label_to_index = {label: i for i, label in enumerate(self.unique_labels)}
+        return self
 
     def transform(self, y):
         """
-        Transform labels to encoded integer labels.
+        Transform labels to integer indices.
 
         Parameters
         ----------
         y : array-like
             Labels to encode.
 
-        Returns:
-        --------
-        encoded_labels : array-like
+        Returns
+        -------
+        encoded_labels : np.ndarray
             Encoded integer labels.
+
+        Raises
+        ------
+        ValueError
+            If the encoder has not been fitted or unknown labels are found.
         """
         if self.unique_labels is None:
             raise ValueError("Label encoder has not been fit yet.")
-        return np.array([self.label_to_index[label] for label in y])
+        y = np.asarray(y).ravel()
+        encoded = []
+        for label in y:
+            if label not in self.label_to_index:
+                raise ValueError(f"Unknown label: {label}")
+            encoded.append(self.label_to_index[label])
+        return np.array(encoded)
 
     def fit_transform(self, y):
-        """Fit label encoder and return encoded labels.
+        """
+        Fit the encoder and transform labels in one step.
 
         Parameters
         ----------
         y : array-like of shape (n_samples,)
-            Target values.
+            Input labels.
 
         Returns
         -------
-        y : array-like of shape (n_samples,)
-            Encoded labels.
+        np.ndarray
+            Encoded integer labels.
         """
-        self.fit(y)
-        return self.transform(y)
+        return self.fit(y).transform(y)
 
     def inverse_transform(self, y):
         """
-        Transform integer labels to original labels.
+        Transform integer indices back to original labels.
 
         Parameters
         ----------
-        y : array-like
+        y : array-like of int
             Encoded integer labels.
 
         Returns
         -------
-        original_labels : array-like
+        original_labels : np.ndarray
             Original labels.
+
+        Raises
+        ------
+        ValueError
+            If the encoder has not been fitted or index is out of bounds.
         """
         if self.unique_labels is None:
             raise ValueError("Label encoder has not been fit yet.")
-        return np.array([self.unique_labels[i] if i in self.label_to_index.values() else "unknown" for i in y])
+        y = np.asarray(y).ravel()
+        return np.array([self.unique_labels[i] if 0 <= i < len(self.unique_labels) else "unknown" for i in y])
 
 
 class ObjectiveScaler:
