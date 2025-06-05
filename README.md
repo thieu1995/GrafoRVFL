@@ -16,30 +16,34 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
-GrafoRVFL is an open-source library in Python that employs gradient-free optimization (GA, PSO, WOA, TLO, DE, ...) to 
-optimize Random Vector Functional Link Networks. It is entirely implemented based on Numpy and fully compatible 
-with the interfaces of the Scikit-Learn library. With GrafoRVFL, you can fine-tune the hyper-parameters of network in the network using gradient-free optimizers.
+## 📑 Overview
+
+**GrafoRVFL** is an open-source Python library designed to optimize Random Vector Functional Link (RVFL) networks using 
+various **gradient-free metaheuristic algorithms** such as GA, PSO, WOA, TLO, DE, etc. It is fully implemented in 
+**NumPy** and seamlessly integrates with the **Scikit-Learn** interface, making it easy to plug into standard 
+ML workflows. GrafoRVFL enables hyperparameter tuning for RVFL networks without relying on gradient-based methods.
 
 
-* **Free software:** GNU General Public License (GPL) V3 license
-* **Documentation:** https://graforvfl.readthedocs.io
-* **Provided Estimator**: `RvflRegressor`, `RvflClassifier`, `GfoRvflCV`, `GfoRvflTuner`, `GfoRvflComparator`
-* **Python versions:** >= 3.8.x
-* **Dependencies:** numpy, scipy, scikit-learn, pandas, mealpy, permetrics, matplotlib
+## ✨ Features
+
+- ✅ Free software under **GNU GPL v3**
+- 📘 Full documentation: [https://graforvfl.readthedocs.io](https://graforvfl.readthedocs.io)
+- 🧠 Estimators:
+  - `RvflRegressor`
+  - `RvflClassifier`
+  - `GfoRvflCV`
+  - `GfoRvflTuner`
+  - `GfoRvflComparator`
+- 🐍 Python compatibility: `>= 3.8`
+- 🧩 Dependencies:
+  - `numpy`, `scipy`, `scikit-learn`, `pandas`, `mealpy`, `permetrics`, `matplotlib`
 
 
-# Citation Request 
-
-* Learn more about Random Vector Functional Link from [this paper](https://doi.org/10.1016/j.ins.2015.09.025)
-
-* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from 
-[this paper](https://doi.org/10.1016/j.neucom.2018.07.080)
-
+## 📖 Citation Request 
 
 Please include these citations if you plan to use this library:
 
 ```bibtex
-
 @software{nguyen_van_thieu_2023_10258280,
   author       = {Nguyen Van Thieu},
   title        = {GrafoRVFL: A Gradient-Free Optimization Framework for Boosting Random Vector Functional Link Network},
@@ -77,29 +81,33 @@ Please include these citations if you plan to use this library:
   organization={IEEE},
   doi={10.1109/SOCA.2018.00014}
 }
-
 ```
 
-# Installation
+* Learn more about Random Vector Functional Link from [this paper](https://doi.org/10.1016/j.ins.2015.09.025)
 
-* Install the [current PyPI release](https://pypi.python.org/pypi/graforvfl):
-```sh 
+* Learn more about on how to use Gradient Free Optimization to fine-tune the hyper-parameter of RVFL networks from 
+[this paper](https://doi.org/10.1016/j.neucom.2018.07.080)
+
+
+## 🔧 Installation
+
+Install the latest version from PyPI:
+
+```bash
 $ pip install graforvfl
 ```
 
-After installation, you can check the installed version by:
+Verify installation:
 
-```sh
+```bash
 $ python
 >>> import graforvfl
 >>> graforvfl.__version__
 ```
 
-# Example
+## 🧪 Example Usage
 
 Below is a simple example code of how to use Gradient Free Optimization to tune hyper-parameter of RVFL network.
-The more complicated cases in the folder: [examples](/examples). You can also read the [documentation](https://graforvfl.readthedocs.io/) 
-for more detailed installation instructions, explanations, and examples.
 
 ```python
 from sklearn.datasets import load_breast_cancer
@@ -144,14 +152,18 @@ print(model.best_estimator)
 print(model.best_estimator.scores(data.X_test, data.y_test, list_metrics=("PS", "RS", "NPV", "F1S", "F2S")))
 ```
 
-# Official channels 
+👉 The more complicated cases in the folder: [examples](/examples). You can also read the [documentation](https://graforvfl.readthedocs.io/) 
+for more detailed installation instructions, explanations, and examples.
 
-* [Official source code repository](https://github.com/thieu1995/GrafoRVFL)
-* [Official document](https://graforvfl.readthedocs.io/)
-* [Download releases](https://pypi.org/project/graforvfl/) 
-* [Issue tracker](https://github.com/thieu1995/GrafoRVFL/issues) 
-* [Notable changes log](/ChangeLog.md)
-* [Official discussion group](https://t.me/+fRVCJGuGJg1mNDg1)
+
+## 📎 Official channels 
+
+* 🔗 [Official source code repository](https://github.com/thieu1995/GrafoRVFL)
+* 📘 [Official document](https://graforvfl.readthedocs.io/)
+* 📦 [Download releases](https://pypi.org/project/graforvfl/) 
+* 🐞 [Issue tracker](https://github.com/thieu1995/GrafoRVFL/issues) 
+* 📝 [Notable changes log](/ChangeLog.md)
+* 💬 [Official discussion group](https://t.me/+fRVCJGuGJg1mNDg1)
 
 ---
 
