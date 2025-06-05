@@ -60,6 +60,15 @@ class GfoRvflTuner:
     verbose : bool, default=False
         Whether to print progress messages to stdout.
 
+    mode : str, optional
+        Mode for optimization (default is 'single').
+
+    n_workers : int, optional
+        Number of workers for parallel processing (default is None).
+
+    termination : any, optional
+        Termination criteria for optimization (default is None).
+
     Attributes
     ----------
     best_optim_params : dict
@@ -79,7 +88,8 @@ class GfoRvflTuner:
     def __init__(self, problem_type="regression", bounds=None,
                  optim="OriginalWOA", optim_param_grid=None,
                  scoring="MSE", cv=None,
-                 search_type="random", n_iter=10, seed=None, verbose=True,  **kwargs):
+                 search_type="random", n_iter=10, seed=None, verbose=True,
+                 mode='single', n_workers=None, termination=None, **kwargs):
         self.problem_type = problem_type
         self.bounds = bounds
         self.optim = optim
@@ -91,6 +101,9 @@ class GfoRvflTuner:
         self.seed = seed
         self.verbose = verbose
         self.generator = np.random.default_rng(seed)
+        self.mode = mode
+        self.n_workers = n_workers
+        self.termination = termination
 
         self.best_optim_params = None
         self.best_searcher = None
@@ -133,8 +146,8 @@ class GfoRvflTuner:
             # Clone base model and update optimization parameters
             model = GfoRvflCV(problem_type=self.problem_type, bounds=self.bounds,
                               optim=self.optim, optim_params=optim_params,
-                              scoring=self.scoring, cv=self.cv,
-                              seed=self.seed, verbose=self.verbose, **self.kwargs)
+                              scoring=self.scoring, cv=self.cv, seed=self.seed, verbose=self.verbose,
+                              mode=self.mode, n_workers=self.n_workers, termination=self.termination, **self.kwargs)
 
             # Perform cross-validation
             scores = []

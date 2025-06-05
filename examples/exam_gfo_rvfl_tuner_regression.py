@@ -41,8 +41,8 @@ optim_param_grid = {
 tuner = GfoRvflTuner(problem_type="regression", bounds=my_bounds,
                      optim="OriginalWOA", optim_param_grid=optim_param_grid,
                      scoring="MSE", cv=3,
-                     search_type="random", n_iter=5,
-                     seed=42, verbose=True)
+                     search_type="random", n_iter=5, seed=42, verbose=True,
+                     mode="single", n_workers=None, termination=None)
 tuner.fit(data.X_train, data.y_train)
 print(tuner.best_score)
 print(tuner.best_optim_params)
