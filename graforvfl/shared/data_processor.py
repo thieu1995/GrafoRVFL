@@ -10,20 +10,72 @@ from graforvfl.shared.scaler import *
 
 
 class TimeSeriesDifferencer:
+    """
+    A class for applying and reversing differencing on time series data.
+
+    Differencing helps remove trends and seasonality from time series for better modeling.
+    """
 
     def __init__(self, interval=1):
+        """
+        Initialize the differencer with a specified interval.
+
+        Parameters
+        ----------
+        interval : int
+            The lag interval to use for differencing. Must be >= 1.
+        """
         if interval < 1:
             raise ValueError("Interval for differencing must be at least 1.")
         self.interval = interval
+        self.original_data = None
 
     def difference(self, X):
+        """
+        Apply differencing to the input time series.
+
+        Parameters
+        ----------
+        X : array-like
+            The original time series data.
+
+        Returns
+        -------
+        np.ndarray
+            The differenced time series of length (len(X) - interval).
+        """
+        X = np.asarray(X)
+        if X.ndim != 1:
+            raise ValueError("Input must be a one-dimensional array.")
         self.original_data = X.copy()
         return np.array([X[i] - X[i - self.interval] for i in range(self.interval, len(X))])
 
     def inverse_difference(self, diff_data):
+        """
+        Reverse the differencing transformation using the stored original data.
+
+        Parameters
+        ----------
+        diff_data : array-like
+            The differenced data to invert.
+
+        Returns
+        -------
+        np.ndarray
+            The reconstructed original data (excluding the first `interval` values).
+
+        Raises
+        ------
+        ValueError
+            If the original data is not available.
+        """
         if self.original_data is None:
-            raise ValueError("Original data is required for inversion.")
-        return np.array([diff_data[i - self.interval] + self.original_data[i - self.interval] for i in range(self.interval, len(self.original_data))])
+            raise ValueError("Original data is required for inversion. Call difference() first.")
+        diff_data = np.asarray(diff_data)
+        return np.array([
+            diff_data[i - self.interval] + self.original_data[i - self.interval]
+            for i in range(self.interval, len(self.original_data))
+        ])
 
 
 class FeatureEngineering:
