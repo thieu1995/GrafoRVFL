@@ -127,6 +127,15 @@ class GfoRvflCV:
         Determines random number generation for weights and bias initialization.
         Pass an int for reproducible results across multiple function calls.
 
+    mode : str, optional
+        Mode for optimization (default is 'single').
+
+    n_workers : int, optional
+        Number of workers for parallel processing (default is None).
+
+    termination : any, optional
+        Termination criteria for optimization (default is None).
+
     Examples
     --------
     >>> from sklearn.datasets import load_breast_cancer
