@@ -168,6 +168,8 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         self.obj_scaler = None
 
     def fit(self, X, y):
+        X = self._to_numpy(X, is_X=True)
+        y = self._to_numpy(y, is_X=False)
         self.size_input = X.shape[1]
         if type(y) in (list, tuple, np.ndarray):
             y = np.squeeze(np.asarray(y))

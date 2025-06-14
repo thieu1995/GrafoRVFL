@@ -83,10 +83,10 @@ class BaseRVFL(BaseEstimator):
         self.weights = {}
         self.obj_scaler, self.loss_train = None, None
         self.n_labels, self.obj_scaler = None, None
+        self.feature_names, self.label_name = None, None
 
     def __repr__(self, **kwargs):
-        """Pretty-print parameters like scikit-learn's Estimator.
-        """
+        """Pretty-print parameters like scikit-learn's Estimator."""
         param_order = list(inspect.signature(self.__init__).parameters.keys())
         param_dict = {k: getattr(self, k) for k in param_order}
 
@@ -96,6 +96,37 @@ class BaseRVFL(BaseEstimator):
         else:
             formatted_params = ",\n  ".join(f"{k}={pprint.pformat(v)}" for k, v in param_dict.items())
             return f"{self.__class__.__name__}(\n  {formatted_params}\n)"
+
+    def _to_numpy(self, data, is_X=True):
+        if isinstance(data, pd.DataFrame):
+            if is_X:
+                if self.feature_names is None:
+                    self.feature_names = data.columns.tolist()
+            else:
+                if self.label_name is None:
+                    self.label_name = data.columns.tolist()
+            return data.values
+        elif isinstance(data, pd.Series):
+            if is_X:
+                if self.feature_names is None:
+                    self.feature_names = [data.name if data.name is not None else "feature_0"]
+            else:
+                if self.label_name is None:
+                    self.label_name = [data.name if data.name is not None else "label_0"]
+            return data.values.reshape(-1, 1)
+        elif isinstance(data, np.ndarray):
+            data_new = data
+            if data.ndim == 1:
+                data_new = data.reshape(-1, 1)
+            if is_X:
+                if self.feature_names is None:
+                    self.feature_names = [f"feature_{i}" for i in range(data_new.shape[1])]
+            else:
+                if self.label_name is None:
+                    self.label_name = [f"label_{i}" for i in range(data_new.shape[1])]
+            return data
+        else:
+            raise TypeError("Input X must be a numpy array or pandas DataFrame/Series.")
 
     def _get_weight_initializer(self, name):
         if type(name) is str:
@@ -122,6 +153,8 @@ class BaseRVFL(BaseEstimator):
         self : BaseRVFL
             The fitted model.
         """
+        X = self._to_numpy(X, is_X=True)
+        y = self._to_numpy(y, is_X=False)
         self.size_input = X.shape[1]
         if type(y) in (list, tuple, np.ndarray):
             y = np.squeeze(np.asarray(y))
@@ -158,6 +191,7 @@ class BaseRVFL(BaseEstimator):
         y_pred : ndarray
             Predicted target values.
         """
+        X = self._to_numpy(X, is_X=True)
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         y_pred = D @ self.weights["Wioho"]
@@ -177,6 +211,7 @@ class BaseRVFL(BaseEstimator):
         y_pred : ndarray
             Predicted probabilities or scores.
         """
+        X = self._to_numpy(X, is_X=True)
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
         y_raw = D @ self.weights["Wioho"]
