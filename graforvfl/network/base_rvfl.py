@@ -10,6 +10,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from scipy import special as ss
 from permetrics import RegressionMetric, ClassificationMetric
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import Ridge
@@ -178,8 +179,12 @@ class BaseRVFL(BaseEstimator):
         """
         H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
         D = np.concatenate((X, H), axis=1)
-        y_pred = D @ self.weights["Wioho"]
-        return y_pred
+        y_raw = D @ self.weights["Wioho"]
+        # if multi-class, use softmax
+        if self.size_output > 1:
+            return ss.softmax(y_raw, axis=1)
+        else:   # if binary, use sigmoid
+            return np.column_stack([1 - ss.expit(y_raw), ss.expit(y_raw)])
 
     def __call__(self, X):
         return self.predict(X)

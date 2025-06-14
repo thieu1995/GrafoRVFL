@@ -195,12 +195,6 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
             self.weights["Wioho"] = ridge_model.fit(D, y_scaled).coef_.T
         return self
 
-    def predict_proba(self, X):
-        H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
-        D = np.concatenate((X, H), axis=1)
-        y_pred = D @ self.weights["Wioho"]
-        return y_pred
-
     def predict(self, X):
         y_pred = self.predict_proba(X)
         return self.obj_scaler.inverse_transform(y_pred)
