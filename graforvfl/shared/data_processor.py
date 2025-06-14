@@ -5,6 +5,7 @@
 # --------------------------------------------------%
 
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from graforvfl.shared.scaler import *
 
@@ -288,10 +289,23 @@ class Data:
     }
 
     def __init__(self, X=None, y=None, name="Unknown"):
-        self.X = X
-        self.y = y
+        self.X = self._to_numpy(X, is_X=True)
+        self.y = self._to_numpy(y, is_X=False)
         self.name = name
         self.X_train, self.y_train, self.X_test, self.y_test = None, None, None, None
+
+    @staticmethod
+    def _to_numpy(data=None, is_X=True):
+        if isinstance(data, pd.DataFrame):
+            return data.values
+        elif isinstance(data, pd.Series):
+            return data.values.reshape(-1, 1) if is_X else data.values.ravel()
+        elif isinstance(data, np.ndarray):
+            if data.ndim == 1:
+                return data.reshape(-1, 1) if is_X else data
+            return data
+        else:
+            raise TypeError(f"Input {'X' if is_X else 'y'} must be a numpy array or pandas DataFrame/Series.")
 
     @staticmethod
     def scale(X, scaling_methods=('standard', ), list_dict_paras=None):
@@ -334,8 +348,8 @@ class Data:
         X_test : np.ndarray
         y_test : np.ndarray
         """
-        self.X_train = X_train
-        self.y_train = y_train
-        self.X_test = X_test
-        self.y_test = y_test
+        self.X_train = self._to_numpy(X_train, is_X=True)
+        self.y_train = self._to_numpy(y_train, is_X=False)
+        self.X_test = self._to_numpy(X_test, is_X=True)
+        self.y_test = self._to_numpy(y_test, is_X=False)
         return self
