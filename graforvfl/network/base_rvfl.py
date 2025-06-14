@@ -83,13 +83,6 @@ class BaseRVFL(BaseEstimator):
         self.obj_scaler, self.loss_train = None, None
         self.n_labels, self.obj_scaler = None, None
 
-    # def __repr__(self, **kwargs):
-    #     """Return a string representation of the object similar to scikit-learn estimators.
-    #     """
-    #     param_order = list(inspect.signature(self.__init__).parameters.keys())  # Lấy danh sách tham số theo thứ tự
-    #     param_str = ", ".join(f"{k}={repr(getattr(self, k))}" for k in param_order)  # Tạo chuỗi in
-    #     return f"{self.__class__.__name__}({param_str})"
-
     def __repr__(self, **kwargs):
         """Pretty-print parameters like scikit-learn's Estimator.
         """
@@ -187,6 +180,9 @@ class BaseRVFL(BaseEstimator):
         D = np.concatenate((X, H), axis=1)
         y_pred = D @ self.weights["Wioho"]
         return y_pred
+
+    def __call__(self, X):
+        return self.predict(X)
 
     def get_weights(self):
         """
