@@ -33,7 +33,7 @@ model.fit(X=data.X_train, y=data.y_train)
 
 ## Test the network
 y_pred = model.predict(data.X_test)
-print(y_pred)
+print(model.predict_proba(data.X_test))
 
 ## Calculate some metrics
 print(model.score(X=data.X_test, y=data.y_test))
