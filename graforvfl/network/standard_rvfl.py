@@ -72,7 +72,7 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
         result : float
             The result of selected metric
         """
-        return self._BaseRVFL__score_reg(X, y, "R2")
+        return self._score_reg(X, y, "R2")
 
     def scores(self, X, y, list_metrics=("MSE", "MAE")):
         """Return the list of regression metrics of the prediction.
@@ -94,7 +94,7 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
         results : dict
             The results of the list metrics
         """
-        return self._BaseRVFL__scores_reg(X, y, list_metrics)
+        return self._scores_reg(X, y, list_metrics)
 
     def evaluate(self, y_true, y_pred, list_metrics=("MSE", "MAE")):
         """Return the list of performance metrics of the prediction.
@@ -115,7 +115,7 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
         results : dict
             The results of the list metrics
         """
-        return self._BaseRVFL__evaluate_reg(y_true, y_pred, list_metrics)
+        return self._evaluate_reg(y_true, y_pred, list_metrics)
 
 
 class RvflClassifier(BaseRVFL, ClassifierMixin):
@@ -218,7 +218,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         result : float
             The result of selected metric
         """
-        return self._BaseRVFL__score_cls(X, y, "AS")
+        return self._score_cls(X, y, "AS")
 
     def scores(self, X, y, list_metrics=("AS", "RS")):
         """Return the list of classification metrics of the prediction.
@@ -240,7 +240,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         results : dict
            The results of the list metrics
         """
-        return self._BaseRVFL__scores_cls(X, y, list_metrics)
+        return self._scores_cls(X, y, list_metrics)
 
     def evaluate(self, y_true, y_pred, list_metrics=("AS", "RS")):
         """Return the list of classification performance metrics of the prediction.
@@ -261,4 +261,4 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         results : dict
             The results of the list metrics
         """
-        return self._BaseRVFL__evaluate_cls(y_true, y_pred, list_metrics)
+        return self._evaluate_cls(y_true, y_pred, list_metrics)

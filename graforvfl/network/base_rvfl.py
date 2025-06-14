@@ -257,23 +257,25 @@ class BaseRVFL(BaseEstimator):
         """
         return np.sum([item.size for item in self.weights.values()])
 
-    def __evaluate_reg(self, y_true, y_pred, list_metrics=("MSE", "MAE")):
+    def _evaluate_reg(self, y_true, y_pred, list_metrics=("MSE", "MAE")):
+        y_true = self._to_numpy(y_true, is_X=False)
         rm = RegressionMetric(y_true=y_true, y_pred=y_pred)
         return rm.get_metrics_by_list_names(list_metrics)
 
-    def __evaluate_cls(self, y_true, y_pred, list_metrics=("AS", "RS")):
+    def _evaluate_cls(self, y_true, y_pred, list_metrics=("AS", "RS")):
+        y_true = self._to_numpy(y_true, is_X=False)
         cm = ClassificationMetric(y_true, y_pred)
         return cm.get_metrics_by_list_names(list_metrics)
 
-    def __score_reg(self, X, y, metric="RMSE"):
+    def _score_reg(self, X, y, metric="RMSE"):
         y_pred = self.predict(X)
         return RegressionMetric(y, y_pred).get_metric_by_name(metric)[metric]
 
-    def __scores_reg(self, X, y, list_metrics=("MSE", "MAE")):
+    def _scores_reg(self, X, y, list_metrics=("MSE", "MAE")):
         y_pred = self.predict(X)
-        return self.__evaluate_reg(y_true=y, y_pred=y_pred, list_metrics=list_metrics)
+        return self._evaluate_reg(y_true=y, y_pred=y_pred, list_metrics=list_metrics)
 
-    def __score_cls(self, X, y, metric="AS"):
+    def _score_cls(self, X, y, metric="AS"):
         return_prob = False
         if self.n_labels > 2:
             if metric in self.CLS_OBJ_LOSSES:
@@ -285,7 +287,7 @@ class BaseRVFL(BaseEstimator):
         cm = ClassificationMetric(y_true=y, y_pred=y_pred)
         return cm.get_metric_by_name(metric)[metric]
 
-    def __scores_cls(self, X, y, list_metrics=("AS", "RS")):
+    def _scores_cls(self, X, y, list_metrics=("AS", "RS")):
         list_errors = list(set(list_metrics) & set(self.CLS_OBJ_LOSSES))
         t1 = {}
         if len(list_errors) > 0:
@@ -296,9 +298,9 @@ class BaseRVFL(BaseEstimator):
                 y_pred = self.predict_proba(X)
             else:
                 y_pred = self.predict(X)
-            t1 = self.__evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_errors)
+            t1 = self._evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_errors)
         y_pred = self.predict(X)
-        t2 = self.__evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_metrics)
+        t2 = self._evaluate_cls(y_true=y, y_pred=y_pred, list_metrics=list_metrics)
         return {**t2, **t1}
 
     def score(self, X, y):
