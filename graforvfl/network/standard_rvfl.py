@@ -5,9 +5,11 @@
 # --------------------------------------------------%
 
 import numpy as np
+from scipy import special as ss
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.linear_model import Ridge
 from graforvfl.network.base_rvfl import BaseRVFL
+from graforvfl.shared import activator
 from graforvfl.shared.scaler import ObjectiveScaler, OneHotEncoder
 
 
@@ -164,42 +166,74 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
 
     def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", reg_alpha=None, seed=None):
         super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, reg_alpha=reg_alpha, seed=seed)
-        self.n_labels = None
-        self.obj_scaler = None
+        self.n_labels, self.obj_scaler, self.classes_ = None, None, None
+
+    def _check_input_output(self, X, y):
+        ## Check X, y
+        self.size_input = X.shape[1]
+        y = np.squeeze(y)
+        if np.isscalar(y):
+            y = np.array([y])
+        if y.ndim == 1:
+            self.size_output = self.n_labels = len(np.unique(y))
+            self.classes_ = np.unique(y)
+        else:
+            raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
 
     def fit(self, X, y):
+        ## Check X, y
         X = self._to_numpy(X, is_X=True)
         y = self._to_numpy(y, is_X=False)
-        self.size_input = X.shape[1]
-        if type(y) in (list, tuple, np.ndarray):
-            y = np.squeeze(np.asarray(y))
-            if y.ndim == 1:
-                self.n_labels = len(np.unique(y))
-                self.size_output = self.n_labels
-                self.classes_ = np.unique(y)
-            else:
-                raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
-        else:
-            raise TypeError("Invalid y array type, it should be list, tuple or np.ndarray")
+        self._check_input_output(X, y)
+        ## Check parameters
+        self.act_func = getattr(activator, self.act_name)
+        self.weight_randomer = self._get_weight_initializer(self.weight_initializer)
+
+        # Transform y to one-hot encoding
         ohe_scaler = OneHotEncoder()
         ohe_scaler.fit(np.reshape(y, (-1, 1)))
         self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
         y_scaled = self.obj_scaler.transform(y)
 
-        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input), seed=self.seed)
-        self.weights["bh"] = self.weight_randomer(self.size_hidden, seed=self.seed).flatten()
-        H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
-        D = np.concatenate((X, H), axis=1)
+        ## Train the model
+        self._init_weights()
+        D = self._get_D(X)
         if self.reg_alpha is None or self.reg_alpha == 0:         # Standard OLS (reg_alpha = 0)
             self.weights["Wioho"] = np.linalg.pinv(D) @ y_scaled
         else:                           # trainer == "L2":
             ridge_model = Ridge(alpha=self.reg_alpha, fit_intercept=False, random_state=self.seed)
             self.weights["Wioho"] = ridge_model.fit(D, y_scaled).coef_.T
+        self.is_fitted = True
+        self.P = np.linalg.inv(D.T @ D + 1e-8 * np.eye(D.shape[1]))
         return self
 
     def predict(self, X):
-        y_pred = self.predict_proba(X)
+        X = self._to_numpy(X, is_X=True)
+        D = self._get_D(X)
+        y_pred = D @ self.weights["Wioho"]
         return self.obj_scaler.inverse_transform(y_pred)
+
+    def predict_proba(self, X):
+        """
+        Predict probabilities (or scores) for classification tasks.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Input data.
+
+        Returns
+        -------
+        y_pred : ndarray
+            Predicted probabilities or scores.
+        """
+        X = self._to_numpy(X, is_X=True)
+        D = self._get_D(X)
+        y_raw = D @ self.weights["Wioho"]
+        if self.size_output > 1:
+            return ss.softmax(y_raw, axis=1)
+        else:   # if binary, use sigmoid
+            return np.column_stack([1 - ss.expit(y_raw), ss.expit(y_raw)])
 
     def score(self, X, y):
         """Return the real Accuracy Score metric

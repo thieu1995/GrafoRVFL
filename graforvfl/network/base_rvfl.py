@@ -10,7 +10,6 @@ import pickle
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from scipy import special as ss
 from permetrics import RegressionMetric, ClassificationMetric
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import Ridge
@@ -76,26 +75,28 @@ class BaseRVFL(BaseEstimator):
     def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_uniform", reg_alpha=None, seed=None):
         self.size_hidden = size_hidden
         self.act_name = act_name
-        self.act_func = getattr(activator, self.act_name)
-        self.seed = seed
-        self.weight_initializer, self.weight_randomer = self._get_weight_initializer(weight_initializer)
+        self.weight_initializer = weight_initializer
         self.reg_alpha = reg_alpha
+        self.seed = seed
+        self.is_fitted = False
+
+        self.act_func, self.weight_randomer = None, None
+        self.size_input, self.size_output = None, None
         self.weights = {}
-        self.obj_scaler, self.loss_train = None, None
-        self.n_labels, self.obj_scaler = None, None
+        self.loss_train = None, None
         self.feature_names, self.label_name = None, None
 
-    def __repr__(self, **kwargs):
-        """Pretty-print parameters like scikit-learn's Estimator."""
-        param_order = list(inspect.signature(self.__init__).parameters.keys())
-        param_dict = {k: getattr(self, k) for k in param_order}
-
-        param_str = ", ".join(f"{k}={repr(v)}" for k, v in param_dict.items())
-        if len(param_str) <= 80:
-            return f"{self.__class__.__name__}({param_str})"
-        else:
-            formatted_params = ",\n  ".join(f"{k}={pprint.pformat(v)}" for k, v in param_dict.items())
-            return f"{self.__class__.__name__}(\n  {formatted_params}\n)"
+    # def __repr__(self, **kwargs):
+    #     """Pretty-print parameters like scikit-learn's Estimator."""
+    #     param_order = list(inspect.signature(self.__init__).parameters.keys())
+    #     param_dict = {k: getattr(self, k) for k in param_order}
+    #
+    #     param_str = ", ".join(f"{k}={repr(v)}" for k, v in param_dict.items())
+    #     if len(param_str) <= 80:
+    #         return f"{self.__class__.__name__}({param_str})"
+    #     else:
+    #         formatted_params = ",\n  ".join(f"{k}={pprint.pformat(v)}" for k, v in param_dict.items())
+    #         return f"{self.__class__.__name__}(\n  {formatted_params}\n)"
 
     def _to_numpy(self, data, is_X=True):
         if isinstance(data, pd.DataFrame):
@@ -114,7 +115,7 @@ class BaseRVFL(BaseEstimator):
                 if self.label_name is None:
                     self.label_name = [data.name if data.name is not None else "label_0"]
             return data.values.reshape(-1, 1)
-        elif isinstance(data, np.ndarray):
+        elif isinstance(data, (list, tuple, np.ndarray)):
             data_new = data
             if data.ndim == 1:
                 data_new = data.reshape(-1, 1)
@@ -129,12 +130,30 @@ class BaseRVFL(BaseEstimator):
             raise TypeError("Input X must be a numpy array or pandas DataFrame/Series.")
 
     def _get_weight_initializer(self, name):
-        if type(name) is str:
+        if isinstance(name, str):
             wi = boundary_controller.check_str("weight_initializer", name, self.SUPPORTED_WEIGHT_INITIALIZER)
             wr = getattr(randomer, f"{wi}_initializer")
-            return wi, wr
+            return wr
         else:
             raise ValueError(f"weight_initializer should be a string and belongs to {self.SUPPORTED_WEIGHT_INITIALIZER}")
+
+    def _init_weights(self):
+        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input), seed=self.seed)
+        self.weights["bh"] = self.weight_randomer(self.size_hidden, seed=self.seed).flatten()
+
+    def _get_D(self, X):
+        H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
+        return np.concatenate([X, H], axis=1)
+
+    def _check_input_output(self, X, y):
+        ## Check X, y
+        self.size_input = X.shape[1]
+        if y.ndim == 1:
+            self.size_output = 1
+        elif y.ndim == 2:
+            self.size_output = y.shape[1]
+        else:
+            raise TypeError("Invalid y array shape, it should be 1D vector or 2D matrix.")
 
     def fit(self, X, y):
         """
@@ -153,28 +172,46 @@ class BaseRVFL(BaseEstimator):
         self : BaseRVFL
             The fitted model.
         """
+        ## Check X, y
         X = self._to_numpy(X, is_X=True)
         y = self._to_numpy(y, is_X=False)
-        self.size_input = X.shape[1]
-        if type(y) in (list, tuple, np.ndarray):
-            y = np.squeeze(np.asarray(y))
-            if y.ndim == 1:
-                self.size_output = 1
-            elif y.ndim == 2:
-                self.size_output = y.shape[1]
-            else:
-                raise TypeError("Invalid y array shape, it should be 1D vector or 2D matrix.")
-        else:
-            raise TypeError("Invalid y array type, it should be list, tuple or np.ndarray")
-        self.weights["Wh"] = self.weight_randomer((self.size_hidden, self.size_input), seed=self.seed)
-        self.weights["bh"] = self.weight_randomer(self.size_hidden, seed=self.seed).flatten()
-        H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
-        D = np.concatenate((X, H), axis=1)
+        self._check_input_output(X, y)
+        ## Check parameters
+        self.act_func = getattr(activator, self.act_name)
+        self.weight_randomer = self._get_weight_initializer(self.weight_initializer)
+
+        ## Train the model
+        self._init_weights()
+        D = self._get_D(X)
         if self.reg_alpha is None or self.reg_alpha == 0:         # Standard OLS (reg_alpha = 0)
             self.weights["Wioho"] = np.linalg.pinv(D) @ y
         else:                           # trainer == "L2":
             ridge_model = Ridge(alpha=self.reg_alpha, fit_intercept=False, random_state=self.seed)
             self.weights["Wioho"] = ridge_model.fit(D, y).coef_.T
+        self.is_fitted = True
+        self.P = np.linalg.inv(D.T @ D + 1e-8 * np.eye(D.shape[1]))
+        return self
+
+    def partial_fit(self, X, y):
+        X = self._to_numpy(X, is_X=True)
+        y = self._to_numpy(y, is_X=False).reshape(-1, 1)
+        self._check_input_output(X, y)
+        if not self.is_fitted:
+            self._init_weights()
+            D = self._get_D(X)
+            self.weights["Wioho"] = np.zeros((D.shape[1], self.size_output))
+            self.P = np.eye(D.shape[1]) * 1e5
+            self.is_fitted = True
+
+        # Batch update
+        D = self._get_D(X)
+        for idx in range(D.shape[0]):
+            d_i = D[idx:idx + 1, :]     # (1, D.shape[1])
+            y_i = y[idx:idx + 1, :]     # (1, self.size_output)
+            P_dT = self.P @ d_i.T
+            k = P_dT / (1.0 + d_i @ P_dT)
+            self.weights["Wioho"] += k @ (y_i - d_i @ self.weights["Wioho"])
+            self.P = self.P - k @ d_i @ self.P
         return self
 
     def predict(self, X):
@@ -192,34 +229,8 @@ class BaseRVFL(BaseEstimator):
             Predicted target values.
         """
         X = self._to_numpy(X, is_X=True)
-        H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
-        D = np.concatenate((X, H), axis=1)
-        y_pred = D @ self.weights["Wioho"]
-        return y_pred
-
-    def predict_proba(self, X):
-        """
-        Predict probabilities (or scores) for classification tasks.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features)
-            Input data.
-
-        Returns
-        -------
-        y_pred : ndarray
-            Predicted probabilities or scores.
-        """
-        X = self._to_numpy(X, is_X=True)
-        H = self.act_func(X @ self.weights["Wh"].T + self.weights["bh"])
-        D = np.concatenate((X, H), axis=1)
-        y_raw = D @ self.weights["Wioho"]
-        # if multi-class, use softmax
-        if self.size_output > 1:
-            return ss.softmax(y_raw, axis=1)
-        else:   # if binary, use sigmoid
-            return np.column_stack([1 - ss.expit(y_raw), ss.expit(y_raw)])
+        D = self._get_D(X)
+        return D @ self.weights["Wioho"]
 
     def __call__(self, X):
         return self.predict(X)
