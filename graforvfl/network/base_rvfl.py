@@ -197,6 +197,10 @@ class BaseRVFL(BaseEstimator):
         y = self._to_numpy(y, is_X=False).reshape(-1, 1)
         self._check_input_output(X, y)
         if not self.is_fitted:
+            ## Check parameters
+            self.act_func = getattr(activator, self.act_name)
+            self.weight_randomer = self._get_weight_initializer(self.weight_initializer)
+
             self._init_weights()
             D = self._get_D(X)
             self.weights["Wioho"] = np.zeros((D.shape[1], self.size_output))
