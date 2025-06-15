@@ -180,6 +180,22 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         else:
             raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
 
+    def _check_input_output_partial(self, X, y):
+        ## Check X, y
+        # y must be 1D vector or 2D matrix with one-hot encoding
+        self.size_input = X.shape[1]
+        y = np.squeeze(y)
+        if np.isscalar(y):  # Single label
+            raise TypeError("y should be a 1D vector or 2D matrix with one-hot encoding, not a scalar.")
+        if y.ndim == 1 and np.all(np.isin(y, [0, 1])):
+            self.size_output = self.n_labels = len(y)
+            self.classes_ = np.arange(self.size_output)
+        elif y.ndim == 2:
+            self.size_output = self.n_labels = y.shape[1]
+            self.classes_ = np.arange(self.size_output)
+        else:
+            raise TypeError("Invalid y array shape, it should be 1D, or 2D matrix with one-hot encoding.")
+
     def fit(self, X, y):
         ## Check X, y
         X = self._to_numpy(X, is_X=True)
@@ -205,6 +221,37 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
             self.weights["Wioho"] = ridge_model.fit(D, y_scaled).coef_.T
         self.is_fitted = True
         self.P = np.linalg.inv(D.T @ D + 1e-8 * np.eye(D.shape[1]))
+        return self
+
+    def partial_fit(self, X, y):
+        X = self._to_numpy(X, is_X=True)
+        y = self._to_numpy(y, is_X=False)
+        self._check_input_output_partial(X, y)
+        if not self.is_fitted:
+            ## Check parameters
+            self.act_func = getattr(activator, self.act_name)
+            self.weight_randomer = self._get_weight_initializer(self.weight_initializer)
+
+            # Transform y to one-hot encoding
+            ohe_scaler = OneHotEncoder()
+            ohe_scaler.fit(np.argmax(y, axis=1).reshape(-1, 1))
+            self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
+
+            self._init_weights()
+            D = self._get_D(X)
+            self.weights["Wioho"] = np.zeros((D.shape[1], self.size_output))
+            self.P = np.eye(D.shape[1]) * 1e5
+            self.is_fitted = True
+
+        # Batch update
+        D = self._get_D(X)
+        for idx in range(D.shape[0]):
+            d_i = D[idx:idx + 1, :]     # (1, D.shape[1])
+            y_i = y[idx:idx + 1, :]     # (1, self.size_output)
+            P_dT = self.P @ d_i.T
+            k = P_dT / (1.0 + d_i @ P_dT)
+            self.weights["Wioho"] += k @ (y_i - d_i @ self.weights["Wioho"])
+            self.P = self.P - k @ d_i @ self.P
         return self
 
     def predict(self, X):
