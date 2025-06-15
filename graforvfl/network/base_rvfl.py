@@ -185,7 +185,7 @@ class BaseRVFL(BaseEstimator):
         D = self._get_D(X)
         if self.reg_alpha is None or self.reg_alpha == 0:         # Standard OLS (reg_alpha = 0)
             self.weights["Wioho"] = np.linalg.pinv(D) @ y
-        else:                           # trainer == "L2":
+        else:
             ridge_model = Ridge(alpha=self.reg_alpha, fit_intercept=False, random_state=self.seed)
             self.weights["Wioho"] = ridge_model.fit(D, y).coef_.T
         self.is_fitted = True
@@ -209,6 +209,7 @@ class BaseRVFL(BaseEstimator):
 
         # Batch update
         D = self._get_D(X)
+        self.weights["Wioho"] = np.reshape(self.weights["Wioho"], (D.shape[1], self.size_output))
         for idx in range(D.shape[0]):
             d_i = D[idx:idx + 1, :]     # (1, D.shape[1])
             y_i = y[idx:idx + 1, :]     # (1, self.size_output)

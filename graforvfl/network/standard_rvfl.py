@@ -10,7 +10,7 @@ from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.linear_model import Ridge
 from graforvfl.network.base_rvfl import BaseRVFL
 from graforvfl.shared import activator
-from graforvfl.shared.scaler import ObjectiveScaler, OneHotEncoder
+from graforvfl.shared.scaler import OneHotEncoder
 
 
 class RvflRegressor(BaseRVFL, RegressorMixin):
@@ -166,50 +166,32 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
 
     def __init__(self, size_hidden=10, act_name='sigmoid', weight_initializer="random_normal", reg_alpha=None, seed=None):
         super().__init__(size_hidden=size_hidden, act_name=act_name, weight_initializer=weight_initializer, reg_alpha=reg_alpha, seed=seed)
-        self.n_labels, self.obj_scaler, self.classes_ = None, None, None
+        self.n_labels, self.ohe_scaler, self.classes_ = None, None, None
 
     def _check_input_output(self, X, y):
         ## Check X, y
         self.size_input = X.shape[1]
-        y = np.squeeze(y)
-        if np.isscalar(y):
-            y = np.array([y])
+        y = np.squeeze(np.array(y))
+        if y.ndim == 0:  # Single label
+            y = np.array([y])  # Convert to 1D array
         if y.ndim == 1:
             self.size_output = self.n_labels = len(np.unique(y))
             self.classes_ = np.unique(y)
         else:
             raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
 
-    def _check_input_output_partial(self, X, y):
-        ## Check X, y
-        # y must be 1D vector or 2D matrix with one-hot encoding
-        self.size_input = X.shape[1]
-        y = np.squeeze(y)
-        if np.isscalar(y):  # Single label
-            raise TypeError("y should be a 1D vector or 2D matrix with one-hot encoding, not a scalar.")
-        if y.ndim == 1 and np.all(np.isin(y, [0, 1])):
-            self.size_output = self.n_labels = len(y)
-            self.classes_ = np.arange(self.size_output)
-        elif y.ndim == 2:
-            self.size_output = self.n_labels = y.shape[1]
-            self.classes_ = np.arange(self.size_output)
-        else:
-            raise TypeError("Invalid y array shape, it should be 1D, or 2D matrix with one-hot encoding.")
-
     def fit(self, X, y):
         ## Check X, y
         X = self._to_numpy(X, is_X=True)
-        y = self._to_numpy(y, is_X=False)
+        y = self._to_numpy(y, is_X=False).reshape(-1, 1)  # Ensure y is a column vector
         self._check_input_output(X, y)
         ## Check parameters
         self.act_func = getattr(activator, self.act_name)
         self.weight_randomer = self._get_weight_initializer(self.weight_initializer)
 
         # Transform y to one-hot encoding
-        ohe_scaler = OneHotEncoder()
-        ohe_scaler.fit(np.reshape(y, (-1, 1)))
-        self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
-        y_scaled = self.obj_scaler.transform(y)
+        self.ohe_scaler = OneHotEncoder().fit(y)
+        y_scaled = self.ohe_scaler.transform(y)  # Transform y to one-hot encoding
 
         ## Train the model
         self._init_weights()
@@ -223,19 +205,21 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         self.P = np.linalg.inv(D.T @ D + 1e-8 * np.eye(D.shape[1]))
         return self
 
-    def partial_fit(self, X, y):
+    def partial_fit(self, X, y, classes=None):
         X = self._to_numpy(X, is_X=True)
-        y = self._to_numpy(y, is_X=False)
-        self._check_input_output_partial(X, y)
+        y = self._to_numpy(y, is_X=False).reshape(-1, 1)  # Ensure y is a column vector
         if not self.is_fitted:
             ## Check parameters
             self.act_func = getattr(activator, self.act_name)
             self.weight_randomer = self._get_weight_initializer(self.weight_initializer)
 
             # Transform y to one-hot encoding
-            ohe_scaler = OneHotEncoder()
-            ohe_scaler.fit(np.argmax(y, axis=1).reshape(-1, 1))
-            self.obj_scaler = ObjectiveScaler(obj_name="softmax", ohe_scaler=ohe_scaler)
+            if classes is None or not isinstance(classes, (list, tuple, np.ndarray)):
+                raise TypeError("classes must be a list, tuple, or numpy array of class labels for first partial_fit call.")
+            self.size_output = self.n_labels = len(classes)
+            self.classes_ = classes
+            self.ohe_scaler = OneHotEncoder().fit(np.reshape(classes, (-1, 1)))
+            self.size_input = X.shape[1]
 
             self._init_weights()
             D = self._get_D(X)
@@ -244,6 +228,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
             self.is_fitted = True
 
         # Batch update
+        y = self.ohe_scaler.transform(y)  # Transform y to one-hot encoding
         D = self._get_D(X)
         for idx in range(D.shape[0]):
             d_i = D[idx:idx + 1, :]     # (1, D.shape[1])
@@ -255,10 +240,8 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         return self
 
     def predict(self, X):
-        X = self._to_numpy(X, is_X=True)
-        D = self._get_D(X)
-        y_pred = D @ self.weights["Wioho"]
-        return self.obj_scaler.inverse_transform(y_pred)
+        y_logits = self.predict_proba(X)
+        return self.ohe_scaler.inverse_transform(y_logits)
 
     def predict_proba(self, X):
         """
