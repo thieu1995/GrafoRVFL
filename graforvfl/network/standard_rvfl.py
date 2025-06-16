@@ -37,7 +37,7 @@ class RvflRegressor(BaseRVFL, RegressorMixin):
     reg_alpha : float (Optional), default=None
         Regularization parameter for L2 training. Effective only when `reg_alpha` > 0.
 
-    seed: int, default=None
+    seed: int (Optional), default=None
         Determines random number generation for weights and bias initialization.
         Pass an int for reproducible results across multiple function calls.
 
@@ -144,7 +144,7 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
     reg_alpha : float (Optional), default=None
         Regularization parameter for L2 training. Effective only when `reg_alpha` > 0.
 
-    seed: int, default=None
+    seed: int (Optional), default=None
         Determines random number generation for weights and bias initialization.
         Pass an int for reproducible results across multiple function calls.
 
