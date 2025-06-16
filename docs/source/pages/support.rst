@@ -14,8 +14,8 @@ Please include these citations if you plan to use this library::
 	@software{nguyen_van_thieu_2023_10258280,
 	  author       = {Nguyen Van Thieu},
 	  title        = {GrafoRVFL: A Gradient-Free Optimization Framework for Boosting Random Vector Functional Link Network},
-	  month        = dec,
-	  year         = 2023,
+	  month        = June,
+	  year         = 2025,
 	  publisher    = {Zenodo},
 	  doi          = {10.5281/zenodo.10258280},
 	  url          = {https://github.com/thieu1995/GrafoRVFL}

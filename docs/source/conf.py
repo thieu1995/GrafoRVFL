@@ -26,7 +26,7 @@ sys.path.insert(1, os.path.abspath('../../graforvfl'))
 # -- Project information -----------------------------------------------------
 
 project = 'graforvfl'
-copyright = '2023, Thieu'
+copyright = '2025, Thieu'
 author = 'Thieu'
 
 # The full version, including alpha/beta/rc tags
