@@ -192,12 +192,16 @@ class DataTransformer(BaseEstimator, TransformerMixin):
 
         self.scalers = [self._get_scaler(technique, paras) for (technique, paras) in
                         zip(self.scaling_methods, self.list_dict_paras)]
+        self.size_input_ = None
 
     @staticmethod
     def _ensure_2d(X):
-        X = np.asarray(X)
+        if isinstance(X, pd.Series) or isinstance(X, pd.DataFrame):
+            X = X.values
+        else:
+            X = np.asarray(X)
         if X.ndim == 1:
-            X = X.reshape(-1, 1)  # convert (n,) to (n, 1)
+            X = X.reshape(-1, 1)    # convert (n,) to (n, 1)
         elif X.ndim != 2:
             raise ValueError(f"Input X must be 1D or 2D, but got shape {X.shape}")
         return X
@@ -228,6 +232,7 @@ class DataTransformer(BaseEstimator, TransformerMixin):
             Fitted transformer.
         """
         X = self._ensure_2d(X)
+        self.size_input_ = X.shape[1]
         for idx, _ in enumerate(self.scalers):
             X = self.scalers[idx].fit_transform(X)
         return self
@@ -247,6 +252,8 @@ class DataTransformer(BaseEstimator, TransformerMixin):
             Transformed data.
         """
         X = self._ensure_2d(X)
+        if hasattr(self, 'size_input_') and X.shape[1] != self.size_input_:
+            raise ValueError("Input dimension does not match the one seen during fit.")
         for scaler in self.scalers:
             X = scaler.transform(X)
         return X
