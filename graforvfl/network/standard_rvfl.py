@@ -181,6 +181,25 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
             raise TypeError("Invalid y array shape, it should be 1D vector containing labels 0, 1, 2,.. and so on.")
 
     def fit(self, X, y):
+        """
+        Fit the RVFLClassifier model on the entire training dataset.
+
+        This method trains the RVFL network using either ordinary least squares (OLS)
+        or ridge regression, depending on the value of `reg_alpha`.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training input samples.
+
+        y : array-like of shape (n_samples,)
+            Target class labels corresponding to X.
+
+        Returns
+        -------
+        self : object
+            Returns the fitted model.
+        """
         ## Check X, y
         X = self._to_numpy(X, is_X=True)
         y = self._to_numpy(y, is_X=False).reshape(-1, 1)  # Ensure y is a column vector
@@ -206,6 +225,34 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         return self
 
     def partial_fit(self, X, y, classes=None):
+        """
+        Perform an incremental update to the model using a mini-batch of data.
+
+        This method supports online or real-time learning. The first call to `partial_fit`
+        must include the full list of target class labels via the `classes` parameter
+        to initialize the output layer and encoder.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input samples for the current batch.
+
+        y : array-like of shape (n_samples,)
+            Target class labels for the current batch.
+
+        classes : array-like of shape (n_classes,), optional
+            List of all possible class labels. Must be provided in the first call only.
+
+        Returns
+        -------
+        self : object
+            Returns the partially fitted model.
+
+        Raises
+        ------
+        TypeError
+            If `classes` is not provided in the first call or not of correct type.
+        """
         X = self._to_numpy(X, is_X=True)
         y = self._to_numpy(y, is_X=False).reshape(-1, 1)  # Ensure y is a column vector
         if not self.is_fitted:
@@ -240,6 +287,22 @@ class RvflClassifier(BaseRVFL, ClassifierMixin):
         return self
 
     def predict(self, X):
+        """
+        Predict class labels for the input samples X.
+
+        This method computes the output probabilities using the hidden and direct layers,
+        then uses the inverse of the one-hot encoder to return class predictions.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input samples.
+
+        Returns
+        -------
+        y_pred : array of shape (n_samples,)
+            Predicted class labels.
+        """
         y_logits = self.predict_proba(X)
         return self.ohe_scaler.inverse_transform(y_logits)
 

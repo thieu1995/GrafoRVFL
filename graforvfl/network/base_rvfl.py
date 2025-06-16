@@ -157,7 +157,11 @@ class BaseRVFL(BaseEstimator):
 
     def fit(self, X, y):
         """
-        Fit the RVFL model to the training data.
+        Fit the RVFL model to the entire training data using closed-form solution.
+
+        The model is trained via ordinary least squares (OLS) when `reg_alpha=0` or
+        ridge regression when `reg_alpha > 0`. Input data is passed through both
+        the nonlinear hidden layer and the direct input-to-output connection.
 
         Parameters
         ----------
@@ -165,12 +169,12 @@ class BaseRVFL(BaseEstimator):
             Training input features.
 
         y : ndarray of shape (n_samples,) or (n_samples, n_outputs)
-            Target values.
+            Target values for regression.
 
         Returns
         -------
         self : BaseRVFL
-            The fitted model.
+            Returns the fitted model.
         """
         ## Check X, y
         X = self._to_numpy(X, is_X=True)
@@ -193,6 +197,26 @@ class BaseRVFL(BaseEstimator):
         return self
 
     def partial_fit(self, X, y):
+        """
+        Perform an online (incremental) update to the model using mini-batch data.
+
+        This method enables streaming or batch-wise training using recursive least squares (RLS)
+        update rules. The model must be initialized in the first call, after which weights are
+        updated incrementally without retraining on previous data.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Input features for the current mini-batch.
+
+        y : ndarray of shape (n_samples,) or (n_samples, n_outputs)
+            Target values for the current mini-batch.
+
+        Returns
+        -------
+        self : BaseRVFL
+            Returns the partially updated model.
+        """
         X = self._to_numpy(X, is_X=True)
         y = self._to_numpy(y, is_X=False).reshape(-1, 1)
         self._check_input_output(X, y)
@@ -223,15 +247,19 @@ class BaseRVFL(BaseEstimator):
         """
         Predict target values using the fitted RVFL model.
 
+        The input features are transformed via both the nonlinear hidden layer and
+        the direct input-output connection, and predictions are made via matrix multiplication
+        with the output weights.
+
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features)
-            Input data.
+            Input data for prediction.
 
         Returns
         -------
-        y_pred : ndarray
-            Predicted target values.
+        y_pred : ndarray of shape (n_samples,) or (n_samples, n_outputs)
+            Predicted continuous target values.
         """
         X = self._to_numpy(X, is_X=True)
         D = self._get_D(X)
