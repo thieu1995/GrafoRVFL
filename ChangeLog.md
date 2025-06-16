@@ -1,3 +1,15 @@
+# Version 2.2.0
+
++ Update `Data` and `DataTransformer` for handling DataFrame or Series
++ Add `partial_fit()` method to `RvflRegressor` and `RvflClassifier` classes for incremental learning.
+  + Support batch training 
+  + Support online training (real-time learning)
+  + Support hybrid training (batch + online)
++ Update `BaseRVFL` class to support explainability with `SHAP`.
++ Update examples, tests, and documentation.
+
+------------------------------------------------------------------------------
+
 # Version 2.1.0
 
 + Update `setup.py` for more robust and maintainable package management.
