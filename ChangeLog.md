@@ -1,12 +1,21 @@
 # Version 2.2.0
 
-+ Update `Data` and `DataTransformer` for handling DataFrame or Series
-+ Add `partial_fit()` method to `RvflRegressor` and `RvflClassifier` classes for incremental learning.
-  + Support batch training 
-  + Support online training (real-time learning)
-  + Support hybrid training (batch + online)
-+ Update `BaseRVFL` class to support explainability with `SHAP`.
-+ Update examples, tests, and documentation.
+### 🔧 Core Updates
+- Enhanced `Data`, `DataTransformer`, and `BaseRVFL` to support both `pandas.DataFrame` and `pandas.Series`.
+
+### 🧠 Incremental Learning
+- Added `partial_fit()` method for: `RvflRegressor` and `RvflClassifier`
+  - ✅ Supports **batch training**
+  - ✅ Supports **online (real-time) learning**
+  - ✅ Supports **hybrid training** (batch + online)
+- 👉 [See streaming examples](/examples/real_time_streaming)
+
+### 📈 Model Explainability
+- Updated `BaseRVFL` to support **SHAP-based model explainability**. 
+- 👉 [See SHAP examples](/examples/shap)
+
+### 🧪 Maintenance
+- Updated examples, tests, and documentation.
 
 ------------------------------------------------------------------------------
 
